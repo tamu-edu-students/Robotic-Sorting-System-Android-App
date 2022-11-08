@@ -2,9 +2,18 @@
     <string name="app_name">Robotic Sorting System</string>
     <string name="initial_screen">Initial</string>
     <string name="support_screen">Support</string>
-    <string name="machine_info_screen">MachineInfo</string>
-    <string name="configuration_screen">Configuration</string>
     <string name="support_button">Support Information</string>
-    <string name="configuration_button">Sorting Configuration</string>
+    <string name="machine_info_screen">MachineInfo</string>
     <string name="machine_info_button">Diagnostics and Information</string>
+    <string name="configuration_screen">Configuration</string>
+    <string name="configuration_button">Sorting Configuration</string>
+    <string name="size_screen">Size</string>
+    <string name="size_button">Sort by Size</string>
+    <string name="size_size1_box_label">Size 1</string>
+    <string name="size_size2_box_label">Size 2</string>
+    <string name="size_size1_box_info">For two-bin sorting, fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters larger than Size 1 will be placed in bin 2.</string>
+    <string name="size_size2_default_info">For two-bin sorting, leave Size 2 blank.</string>
+    <string name="size_size2_box_info">For three-bin sorting, add a number for Size 2. Fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters between Size 1 and Size 2 will be placed in Bin 2. Fruits with diameters larger than Size 2 will be placed in Bin 3.</string>
+    <string name="color_screen">Color</string>
+
 </resources>

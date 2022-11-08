@@ -14,10 +14,10 @@ import com.example.roboticsortingsystem.R
 
 @Composable
 fun InitialScreen( // Creates the screen initially shown on launching the app
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier // Passing a default modifier is good practice
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
+    Column( // Places all of the buttons in a "column" object for easy alignment
+        modifier = modifier.fillMaxWidth(), // Makes buttons as wide as the screen: will be used for styling later
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -44,7 +44,7 @@ fun InitialScreenButton(
     }
 }
 
-// Function allowing preview
+// Preview function used for debugging in Android Studio
 @Preview
 @Composable
 fun InitialScreenPreview() {
