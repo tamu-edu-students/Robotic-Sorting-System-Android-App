@@ -7,8 +7,9 @@
     <string name="machine_info_button">Diagnostics and Information</string>
     <string name="configuration_screen">Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
+    <string name="configuration_size_button">Sort by Size</string>
+    <string name="configuration_color_button">Sort by Color</string>
     <string name="size_screen">Size</string>
-    <string name="size_button">Sort by Size</string>
     <string name="size_size1_box_label">Size 1</string>
     <string name="size_size2_box_label">Size 2</string>
     <string name="size_size1_box_info">For two-bin sorting, fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters larger than Size 1 will be placed in bin 2.</string>

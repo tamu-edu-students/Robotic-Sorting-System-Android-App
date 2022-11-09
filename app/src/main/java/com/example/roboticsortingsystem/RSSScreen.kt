@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.roboticsortingsystem.ui.theme.SizeSortingScreen
+import com.example.roboticsortingsystem.ui.theme.ConfigurationScreen
 
 // Enum class holds names of screens in the app
 enum class RSSScreen(@StringRes val title: Int) {
@@ -23,7 +23,7 @@ fun RSSApp( // Controls navigation between screens
     modifier: Modifier = Modifier // Good practice to pass a default modifier
 ) {
     // Test: show initial screen
-    SizeSortingScreen()
+    ConfigurationScreen()
 }
 
 // Preview function

@@ -52,7 +52,7 @@ fun SizeSortingScreen (
     ) {
         // Screen title
         Text(
-            text = stringResource(id = R.string.size_button), // Header is the same text as the button
+            text = stringResource(id = R.string.configuration_size_button), // Header is the same text as the button used to select it
             textAlign = TextAlign.Center,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
