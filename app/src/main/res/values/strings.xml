@@ -5,6 +5,7 @@
     <string name="support_button">Support Information</string>
     <string name="machine_info_screen">MachineInfo</string>
     <string name="machine_info_button">Diagnostics and Information</string>
+    <string name="common_send_button">Send Configuration to System</string>
     <string name="configuration_screen">Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
     <string name="configuration_size_button">Sort by Size</string>
