@@ -13,9 +13,11 @@ import com.example.roboticsortingsystem.components.ScreenSelectButton
 @Composable
 fun ConfigurationScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center // TODO: this doesn't seem to center the column vertically, why?
+        verticalArrangement = Arrangement.Center
     ) {
         ScreenSelectButton(labelResourceId = R.string.configuration_size_button, onClick = { /*TODO*/ })
         Spacer(modifier = Modifier.height(16.dp))

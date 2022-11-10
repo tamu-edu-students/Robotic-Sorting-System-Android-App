@@ -14,7 +14,9 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
     modifier: Modifier = Modifier // Passing a default modifier is good practice
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
-        modifier = modifier.fillMaxWidth(), // Makes buttons as wide as the screen: will be used for styling later
+        modifier = modifier
+            .fillMaxWidth() // Makes buttons as wide as the screen: will be used for styling later
+            .fillMaxHeight(), // Centers the buttons vertically
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
