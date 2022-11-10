@@ -10,18 +10,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.roboticsortingsystem.R
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
+import com.example.roboticsortingsystem.components.ScreenTitle
 
 @Composable
 // Common framework for the two text boxes: simplifies code in SizeSortingScreen
-// TODO: make text entry work
 fun InputBox(
     @StringRes label: Int, // Value displayed on text box
     entry: String,
@@ -43,7 +41,7 @@ fun SizeSortingScreen (
     modifier: Modifier = Modifier
 ) {
     var size1Input by remember { mutableStateOf("") } // Passed to InputBox to display user text
-    var size2Input by remember { mutableStateOf("") }
+    var size2Input by remember { mutableStateOf("") } // TODO: make these stay when device rotated
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -52,13 +50,7 @@ fun SizeSortingScreen (
         verticalArrangement = Arrangement.Top
     ) {
         // Screen title
-        Text(
-            text = stringResource(id = R.string.configuration_size_button), // Header is the same text as the button used to select it
-            textAlign = TextAlign.Center,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+        ScreenTitle(title = R.string.configuration_size_button)
         // Size 1 input box
         InputBox(
             label = R.string.size_size1_box_label,
