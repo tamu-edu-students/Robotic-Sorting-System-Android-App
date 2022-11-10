@@ -17,5 +17,15 @@
     <string name="size_size2_default_info">For two-bin sorting, leave Size 2 blank.</string>
     <string name="size_size2_box_info">For three-bin sorting, add a number for Size 2. Fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters between Size 1 and Size 2 will be placed in Bin 2. Fruits with diameters larger than Size 2 will be placed in Bin 3.</string>
     <string name="color_screen">Color</string>
+    <string name="color_color1">Color 1</string>
+    <string name="color_color2">Color 2</string>
+    <string name="color_color2_info">Leave blank for 2-bin sorting.</string>
+    <string name="color_none">None (for 2-bin sorting)</string>
+    <string name="color_red">Red</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_green">Green</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_brown">Brown</string>
 
 </resources>
