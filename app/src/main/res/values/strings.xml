@@ -5,6 +5,11 @@
     <string name="support_button">Support Information</string>
     <string name="machine_info_screen">MachineInfo</string>
     <string name="machine_info_button">Diagnostics and Information</string>
+    <string name="machine_info_current_color">Sensed color: orange</string>
+    <string name="machine_info_current_size">Sensed size (diameter): 12.2 cm</string>
+    <string name="machine_info_current_weight_bin_1">Current Bin 1 weight: 4.4 kg</string>
+    <string name="machine_info_current_weight_bin_2">Current Bin 2 weight: 0.7 kg</string>
+    <string name="machine_info_current_weight_bin_3">Current Bin 3 weight: 0.0 kg</string>
     <string name="common_send_button">Send Configuration to System</string>
     <string name="configuration_screen">Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
