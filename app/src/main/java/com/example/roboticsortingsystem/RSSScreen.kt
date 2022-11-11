@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.roboticsortingsystem.ui.theme.ColorSortingScreen
+import com.example.roboticsortingsystem.ui.theme.SizeSortingScreen
 
 // Enum class holds names of screens in the app
 // TODO: evaluate if this is necessary given how the app is drawing buttons
@@ -24,7 +25,7 @@ fun RSSApp( // Controls navigation between screens
     modifier: Modifier = Modifier // Good practice to pass a default modifier
 ) {
     // Test: show initial screen
-    ColorSortingScreen()
+    SizeSortingScreen()
 }
 
 // Preview function

@@ -2,7 +2,9 @@ package com.example.roboticsortingsystem.ui.theme
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -45,7 +47,8 @@ fun SizeSortingScreen (
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()), // Allows scrolling for smaller screens
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
