@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -26,7 +27,7 @@ fun ScreenSelectButton(
 ) {
     Button(
         onClick = onClick,
-        modifier.fillMaxWidth()
+        modifier.widthIn(min = 300.dp) // Temporary to make the screen look better: will make full-width later
     ) {
         Text(stringResource(id = labelResourceId))
     }
