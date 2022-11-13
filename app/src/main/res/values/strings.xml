@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Robotic Sorting System</string>
-    <string name="initial_screen">Initial</string>
-    <string name="support_screen">Support</string>
+    <string name="initial_screen">Robotic Sorting System</string>
+    <string name="support_screen">Support Information</string>
     <string name="support_button">Support Information</string>
     <string name="support_project_info">The Robotic Sorting System is the capstone design project of Pace Dominy, Joseph Miller, and Lam Tran. It was created in the 2022–2023 academic year at Texas A&amp;M University.</string>
     <string name="support_project_contact">For any issues with the system whose cause or solution cannot easily be determined or resolved, please contact Pace Dominy at pacedominy7@tamu.edu, Joseph Miller at josephmiller954@tamu.edu, or Lam Tran at lamandrew@tamu.edu.</string>
-    <string name="machine_info_screen">MachineInfo</string>
+    <string name="machine_info_screen">Diagnostics and Information</string>
     <string name="machine_info_button">Diagnostics and Information</string>
     <string name="machine_info_current_color">Sensed color: orange</string>
     <string name="machine_info_current_size">Sensed size (diameter): 12.2 cm</string>
@@ -14,17 +14,18 @@
     <string name="machine_info_current_weight_bin_3">Current Bin 3 weight: 0.0 kg</string>
     <string name="common_send_button">Send Configuration to System</string>
     <string name="common_cancel_button">Cancel</string>
-    <string name="configuration_screen">Configuration</string>
+    <string name="common_back_button">Back</string>
+    <string name="configuration_screen">Sorting Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
     <string name="configuration_size_button">Sort by Size</string>
     <string name="configuration_color_button">Sort by Color</string>
-    <string name="size_screen">Size</string>
+    <string name="size_screen">Sort by Size</string>
     <string name="size_size1_box_label">Size 1</string>
     <string name="size_size2_box_label">Size 2</string>
     <string name="size_size1_box_info">For two-bin sorting, fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters larger than Size 1 will be placed in bin 2.</string>
     <string name="size_size2_default_info">For two-bin sorting, leave Size 2 blank.</string>
     <string name="size_size2_box_info">For three-bin sorting, add a number for Size 2. Fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters between Size 1 and Size 2 will be placed in Bin 2. Fruits with diameters larger than Size 2 will be placed in Bin 3.</string>
-    <string name="color_screen">Color</string>
+    <string name="color_screen">Sort by Color</string>
     <string name="color_color1">Color 1</string>
     <string name="color_color2">Color 2</string>
     <string name="color_color2_info">Leave blank for 2-bin sorting.</string>

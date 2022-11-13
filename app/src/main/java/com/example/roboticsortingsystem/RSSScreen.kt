@@ -1,15 +1,19 @@
 package com.example.roboticsortingsystem
 
 import androidx.annotation.StringRes
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.roboticsortingsystem.ui.theme.*
 
 
@@ -23,15 +27,48 @@ enum class RSSScreen(@StringRes val title: Int) {
     ColorSorting(title = R.string.color_screen)
 }
 
-// TODO: Implement top bar
+// Displays top bar and allows backward navigation where possible
+@Composable
+fun RSSAppTopBar(
+    currentScreen: RSSScreen, // Passes in currently displayed screen
+    canNavigateBack: Boolean, // Determines whether to show a back button
+    navigateBack: () -> Unit, // Provides "back" functionality
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(stringResource(id = currentScreen.title)) },
+        modifier = modifier,
+        navigationIcon = {
+            if (canNavigateBack) {
+                IconButton(onClick = navigateBack) { // Show back button if and only if back navigation is allowed
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack, // Uses standard Android back icon
+                        contentDescription = stringResource(id = R.string.common_back_button) // Adds content description for screen readers
+                    )
+                }
+            }
+        }
+    )
+}
 
 @Composable
 fun RSSApp( // Controls navigation between screens
     modifier: Modifier = Modifier // Good practice to pass a default modifier
 ) {
-    val navController = rememberNavController()
+    val navController = rememberNavController() // Initializes NavController used to move between screens
+    val backStackEntry by navController.currentBackStackEntryAsState() // Stores the previous screen to be passed to the nav bar (to determine if backwards navigation is possible)
+    val currentScreen = RSSScreen.valueOf(
+        backStackEntry?.destination?.route ?: RSSScreen.Initial.name // Provides a default value if backStackEntry is null
+    )
 
-    Scaffold() {
+    Scaffold(
+        topBar = {
+            RSSAppTopBar(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null, // Only show back button if there's a previous screen to go back to
+                navigateBack = { navController.navigateUp() }) // navController function that goes back to the last screen
+        }
+    ) {
         NavHost( // Controls screen navigation for the whole app
             navController = navController,
             startDestination = RSSScreen.Initial.name, // Tells the NavHost to start at the initial screen
@@ -57,13 +94,24 @@ fun RSSApp( // Controls navigation between screens
                 )
             }
             composable(route = RSSScreen.SizeSorting.name) {
-                SizeSortingScreen()
+                SizeSortingScreen(
+                    onCancelButtonClicked = { returnToStart(navController) }
+                )
             }
             composable(route = RSSScreen.ColorSorting.name) {
-                ColorSortingScreen()
+                ColorSortingScreen(
+                    onCancelButtonClicked = { returnToStart(navController) }
+                )
             }
         }
     }
+}
+
+// When a "Cancel" button is pressed, this moves back to the initial screen
+private fun returnToStart(
+    navController: NavHostController
+) {
+    navController.popBackStack(RSSScreen.Initial.name, inclusive = false) // Inclusive = false: leaves the initial screen in the stack to display
 }
 
 // Preview function

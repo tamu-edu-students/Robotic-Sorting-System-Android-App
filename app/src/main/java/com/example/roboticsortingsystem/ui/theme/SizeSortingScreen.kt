@@ -88,7 +88,7 @@ fun SizeSortingScreen (
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-        ConfigurationCancelButton(onClick = { onCancelButtonClicked })
+        ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
         ConfigurationApplyButton(onClick = { /*TODO*/ }) // Call common configuration apply button
     }
 }

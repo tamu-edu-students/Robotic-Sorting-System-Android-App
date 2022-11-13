@@ -105,7 +105,7 @@ fun ColorSortingScreen(
         Divider(thickness = 1.dp, modifier = modifier.padding(top = 8.dp, bottom = 16.dp))
         ColorButtons()
         Spacer(modifier = Modifier.height(32.dp))
-        ConfigurationCancelButton(onClick = { onCancelButtonClicked })
+        ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
         ConfigurationApplyButton(onClick = { /*TODO*/ })
     }
 }
