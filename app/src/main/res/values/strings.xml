@@ -13,6 +13,7 @@
     <string name="machine_info_current_weight_bin_2">Current Bin 2 weight: 0.7 kg</string>
     <string name="machine_info_current_weight_bin_3">Current Bin 3 weight: 0.0 kg</string>
     <string name="common_send_button">Send Configuration to System</string>
+    <string name="common_cancel_button">Cancel</string>
     <string name="configuration_screen">Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
     <string name="configuration_size_button">Sort by Size</string>

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,6 +30,17 @@ fun ScreenSelectButton(
     ) {
         Text(stringResource(id = labelResourceId))
     }
+}
+
+// Provides a common framework for the cancel button (that returns to the first screen) in the two sorting screens
+@Composable
+fun ConfigurationCancelButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+   OutlinedButton(onClick = onClick) {
+       Text(stringResource(id = R.string.common_cancel_button))
+   } 
 }
 
 // Provides a common framework for configuration application buttons in the two sorting screens

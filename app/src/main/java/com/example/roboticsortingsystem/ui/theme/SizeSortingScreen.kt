@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
+import com.example.roboticsortingsystem.components.ConfigurationCancelButton
 import com.example.roboticsortingsystem.components.ScreenTitle
 
 @Composable
@@ -86,6 +87,7 @@ fun SizeSortingScreen (
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
+        ConfigurationCancelButton(onClick = { /*TODO*/ })
         ConfigurationApplyButton(onClick = { /*TODO*/ }) // Call common configuration apply button
     }
 }
