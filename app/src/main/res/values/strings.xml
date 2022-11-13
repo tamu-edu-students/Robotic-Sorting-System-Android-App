@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Robotic Sorting System</string>
-    <string name="initial_screen">Robotic Sorting System</string>
+    <string name="initial_screen">Welcome to the Robotic Sorting System</string>
     <string name="support_screen">Support Information</string>
     <string name="support_button">Support Information</string>
     <string name="support_project_info">The Robotic Sorting System is the capstone design project of Pace Dominy, Joseph Miller, and Lam Tran. It was created in the 2022–2023 academic year at Texas A&amp;M University.</string>

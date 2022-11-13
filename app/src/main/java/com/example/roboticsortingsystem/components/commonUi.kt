@@ -55,18 +55,3 @@ fun ConfigurationApplyButton(
         Text(stringResource(id = R.string.common_send_button))
     }
 }
-
-// Provides a common framework for screen titles (with 32dp spacer)
-@Composable
-fun ScreenTitle (
-    @StringRes title: Int,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = stringResource(id = title),
-        textAlign = TextAlign.Center,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(32.dp))
-}

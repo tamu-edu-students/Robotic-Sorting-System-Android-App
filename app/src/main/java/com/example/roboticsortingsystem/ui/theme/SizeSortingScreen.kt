@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
-import com.example.roboticsortingsystem.components.ScreenTitle
 
 @Composable
 // Common framework for the two text boxes: simplifies code in SizeSortingScreen
@@ -54,8 +53,6 @@ fun SizeSortingScreen (
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // Screen title
-        ScreenTitle(title = R.string.configuration_size_button)
         // Size 1 input box
         InputBox(
             label = R.string.size_size1_box_label,

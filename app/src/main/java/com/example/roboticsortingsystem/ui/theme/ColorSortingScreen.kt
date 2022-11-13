@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import com.example.roboticsortingsystem.R
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
-import com.example.roboticsortingsystem.components.ScreenTitle
 
 // Creates column of radio buttons for color choice (should be called from inside a column)
 @Composable
@@ -79,8 +78,6 @@ fun ColorSortingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // Screen title w/ 32dp spacer
-        ScreenTitle(title = R.string.configuration_color_button)
         // Color 1 selection
         Text(
             text = stringResource(id = R.string.color_color1),

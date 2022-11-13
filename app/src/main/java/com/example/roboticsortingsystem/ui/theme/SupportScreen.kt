@@ -14,7 +14,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
-import com.example.roboticsortingsystem.components.ScreenTitle
 
 // Provides common formatting for all text on this screen
 @Composable
@@ -39,7 +38,6 @@ fun SupportScreen (
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ScreenTitle(title = R.string.support_button)
         SupportText(supportInfo = R.string.support_project_info)
         SupportText(supportInfo = R.string.support_project_contact)
     }

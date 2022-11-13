@@ -15,7 +15,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
-import com.example.roboticsortingsystem.components.ScreenTitle
 
 // Provides common formatting for all text in the diagnostic box
 @Composable
@@ -45,14 +44,6 @@ fun MachineInfoScreen(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ScreenTitle(title = R.string.machine_info_button)
-        }
         Column(
             modifier = modifier
                 .fillMaxWidth()
