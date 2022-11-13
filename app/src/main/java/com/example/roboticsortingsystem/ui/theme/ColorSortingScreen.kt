@@ -66,7 +66,8 @@ fun ColorButtons(
 
 @Composable
 fun ColorSortingScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCancelButtonClicked: () -> Unit = {}
 ) {
     var color1Input by remember { mutableStateOf("") } // Stores user's chosen colors
     var color2Input by remember { mutableStateOf("") }
@@ -104,7 +105,7 @@ fun ColorSortingScreen(
         Divider(thickness = 1.dp, modifier = modifier.padding(top = 8.dp, bottom = 16.dp))
         ColorButtons()
         Spacer(modifier = Modifier.height(32.dp))
-        ConfigurationCancelButton(onClick = { /*TODO*/ })
+        ConfigurationCancelButton(onClick = { onCancelButtonClicked })
         ConfigurationApplyButton(onClick = { /*TODO*/ })
     }
 }

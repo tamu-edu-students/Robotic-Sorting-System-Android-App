@@ -11,7 +11,11 @@ import com.example.roboticsortingsystem.components.ScreenSelectButton
 
 // Creates screen to choose from size sorting or color sorting
 @Composable
-fun ConfigurationScreen(modifier: Modifier = Modifier) {
+fun ConfigurationScreen(
+    modifier: Modifier = Modifier,
+    onSizeButtonClicked: () -> Unit = {},
+    onColorButtonClicked: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -19,9 +23,9 @@ fun ConfigurationScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        ScreenSelectButton(labelResourceId = R.string.configuration_size_button, onClick = { /*TODO*/ })
+        ScreenSelectButton(labelResourceId = R.string.configuration_size_button, onClick = { onSizeButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.configuration_color_button, onClick = { /*TODO*/ })
+        ScreenSelectButton(labelResourceId = R.string.configuration_color_button, onClick = { onColorButtonClicked() })
     }
 }
 

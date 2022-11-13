@@ -14,7 +14,6 @@ import com.example.roboticsortingsystem.ui.theme.*
 
 
 // Enum class holds names of screens in the app
-// TODO: evaluate if this is necessary given how the app is drawing buttons
 enum class RSSScreen(@StringRes val title: Int) {
     Initial(title = R.string.initial_screen),
     Support(title = R.string.support_screen),
@@ -38,8 +37,12 @@ fun RSSApp( // Controls navigation between screens
             startDestination = RSSScreen.Initial.name, // Tells the NavHost to start at the initial screen
             modifier = Modifier // Uses modifier passed into RSSApp
         ) { // Call composables corresponding to each screen
-            composable(route = RSSScreen.Initial.name) {
-                InitialScreen() // Calling the function within this composable allows navigation to/from the screen
+            composable(route = RSSScreen.Initial.name) { // Calling the function within this composable allows navigation to/from the screen
+                InitialScreen(
+                    onSupportButtonClicked = {navController.navigate(RSSScreen.Support.name)}, // Calls the NavController to move to the support screen
+                    onMachineInfoButtonClicked = {navController.navigate(RSSScreen.MachineInfo.name)},
+                    onConfigurationButtonClicked = {navController.navigate(RSSScreen.Configuration.name)}
+                )
             }
             composable(route = RSSScreen.Support.name) {
                 SupportScreen()
@@ -48,7 +51,10 @@ fun RSSApp( // Controls navigation between screens
                 MachineInfoScreen()
             }
             composable(route = RSSScreen.Configuration.name) {
-                ConfigurationScreen()
+                ConfigurationScreen(
+                    onSizeButtonClicked = {navController.navigate(RSSScreen.SizeSorting.name)},
+                    onColorButtonClicked = {navController.navigate(RSSScreen.ColorSorting.name)}
+                )
             }
             composable(route = RSSScreen.SizeSorting.name) {
                 SizeSortingScreen()
@@ -58,8 +64,6 @@ fun RSSApp( // Controls navigation between screens
             }
         }
     }
-    // Screen preview function
-    // ColorSortingScreen()
 }
 
 // Preview function

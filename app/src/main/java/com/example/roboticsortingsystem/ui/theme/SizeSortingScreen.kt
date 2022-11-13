@@ -41,7 +41,8 @@ fun InputBox(
 // Shows the screen used to pass size configurations to the RSS
 @Composable
 fun SizeSortingScreen (
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCancelButtonClicked: () -> Unit = {} // Allows the main RSSScreen to pass in cancel button behavior
 ) {
     var size1Input by remember { mutableStateOf("") } // Passed to InputBox to display user text
     var size2Input by remember { mutableStateOf("") } // TODO: make these stay when device rotated
@@ -87,7 +88,7 @@ fun SizeSortingScreen (
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-        ConfigurationCancelButton(onClick = { /*TODO*/ })
+        ConfigurationCancelButton(onClick = { onCancelButtonClicked })
         ConfigurationApplyButton(onClick = { /*TODO*/ }) // Call common configuration apply button
     }
 }
