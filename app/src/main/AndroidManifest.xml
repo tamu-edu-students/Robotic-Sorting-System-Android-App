@@ -2,6 +2,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Android 12+ Bluetooth permissions -->
+    <!-- Scans for Bluetooth devices without using location (and asserts such) -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s"/>
+    <!-- Allows interaction with connected Bluetooth devices -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+
+    <!-- Android 9-11 Bluetooth permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" />
+    
+    <!-- Prevents the app from showing up on the Play Store for Android devices that don't support Bluetooth LE -->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
