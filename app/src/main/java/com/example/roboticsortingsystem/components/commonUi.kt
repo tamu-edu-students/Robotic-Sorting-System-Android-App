@@ -27,7 +27,7 @@ fun ScreenSelectButton(
 ) {
     Button(
         onClick = onClick,
-        modifier.widthIn(min = 300.dp) // Temporary to make the screen look better: will make full-width later
+        modifier.widthIn(min = 350.dp) // Temporary to make the screen look better: will make full-width later
     ) {
         Text(stringResource(id = labelResourceId))
     }

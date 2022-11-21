@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
+private const val RUNTIME_PERMISSION_REQUEST_CODE = 2
 
 class MainActivity : ComponentActivity() {
 
