@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
@@ -15,7 +14,7 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
     modifier: Modifier = Modifier, // Passing a default modifier is good practice
     onSupportButtonClicked: () -> Unit = {}, // Handles navigation to the support screen when requested
     onMachineInfoButtonClicked: () -> Unit = {}, // Same for machine info screen
-    onConfigurationButtonClicked: () -> Unit = {}
+    onConfigurationButtonClicked: () -> Unit = {},
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
         modifier = modifier
@@ -30,7 +29,7 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
         Spacer(modifier = Modifier.height(16.dp))
         ScreenSelectButton(labelResourceId = R.string.support_button, onClick = { onSupportButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.connect_button, onClick = { /*TODO*/ })
+        ScreenSelectButton(labelResourceId = R.string.connect_button, onClick = {})
     }
 }
 

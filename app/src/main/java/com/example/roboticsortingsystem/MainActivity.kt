@@ -1,19 +1,26 @@
 package com.example.roboticsortingsystem
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.roboticsortingsystem.bluetooth.hasRequiredRuntimePermissions
+import com.example.roboticsortingsystem.bluetooth.requestRelevantRuntimePermissions
 import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
@@ -27,6 +34,36 @@ class MainActivity : ComponentActivity() {
         bluetoothManager.adapter
     }
 
+    // Starts Bluetooth scan (and ensures that the app has permission to do so)
+    @SuppressLint("MissingPermission") // Prevents Android Studio from getting upset that there's no permission check here: they're in the Context extensions
+    private fun startBleScan() {
+        if (!hasRequiredRuntimePermissions()) {
+            requestRelevantRuntimePermissions()
+        } else {
+            bleScanner.startScan(null, scanSettings, scanCallback)
+        }
+    }
+
+    // Instantiates the Bluetooth LE scanner
+    private val bleScanner by lazy {
+        bluetoothAdapter.bluetoothLeScanner
+    }
+
+    // Used to configure settings for scanner
+    private val scanSettings = ScanSettings.Builder()
+        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY) // Ideal for finding a specific sort of device quickly - here, the Raspberry Pi
+        .build()
+
+    // Notifies the application when a scan result is available
+    private val scanCallback = object: ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
+                    with(result.device) {
+                        Log.i("ScanCallback", "Found BLE device named ${name ?: "Unnamed"}, with address $address") // Returns Unnamed if device does not broadcast a name
+                    }
+            }
+    }
+
     // Requests that the user enable Bluetooth if it's not enabled
     private var startBluetoothIntentForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode != Activity.RESULT_OK) { // the actual check that Bluetooth is enabled
@@ -34,13 +71,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Sends the Bluetooth enable request to the system
     private fun showBluetoothDialog() {
         // Need to request permission to connect at runtime in Android 12
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) { // Enters function body if permission has not been given to enable Bluetooth
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // S = Android 12
                 ActivityCompat.requestPermissions(
                     this@MainActivity,
-                    arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
+                    arrayOf(Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN),
                     2
                 )
             return
@@ -52,6 +90,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Calls and starts the app UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -65,6 +104,7 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         showBluetoothDialog()
+        startBleScan()
     }
 
 }
