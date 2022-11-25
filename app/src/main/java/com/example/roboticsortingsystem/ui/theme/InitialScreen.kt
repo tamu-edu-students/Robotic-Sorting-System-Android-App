@@ -28,8 +28,6 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
         ScreenSelectButton(labelResourceId = R.string.machine_info_button, onClick = { onMachineInfoButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
         ScreenSelectButton(labelResourceId = R.string.support_button, onClick = { onSupportButtonClicked() })
-        Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.connect_button, onClick = {})
     }
 }
 

@@ -15,7 +15,6 @@
     <string name="common_send_button">Send Configuration to System</string>
     <string name="common_cancel_button">Cancel</string>
     <string name="common_back_button">Back</string>
-    <string name="connect_button">Establish Bluetooth Connection</string>
     <string name="configuration_screen">Sorting Configuration</string>
     <string name="configuration_button">Sorting Configuration</string>
     <string name="configuration_size_button">Sort by Size</string>

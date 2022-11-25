@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.roboticsortingsystem.bluetooth.hasRequiredRuntimePermissions
@@ -85,6 +86,7 @@ class MainActivity : ComponentActivity() {
                     }
             }
     }
+
 
     // Callback for gatt connection
     @SuppressLint("MissingPermission")
