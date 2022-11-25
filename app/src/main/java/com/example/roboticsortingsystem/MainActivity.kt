@@ -4,7 +4,10 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
@@ -25,23 +28,37 @@ import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
 
 private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val RUNTIME_PERMISSION_REQUEST_CODE = 2
+// Sets name of Bluetooth device to automatically connect to
+private const val DEVICE_TO_CONNECT = "RoboticSortingSystemTest"
 
 class MainActivity : ComponentActivity() {
 
     // Instantiate the Bluetooth adapter and manager
-    private val bluetoothAdapter: BluetoothAdapter by lazy { // Lazy: only instatiated when needed
+    private val bluetoothAdapter: BluetoothAdapter by lazy { // Lazy: only instantiated when needed
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
 
+    // Used to indicate whether Bluetooth scan is active
+    private var isScanning = false
     // Starts Bluetooth scan (and ensures that the app has permission to do so)
     @SuppressLint("MissingPermission") // Prevents Android Studio from getting upset that there's no permission check here: they're in the Context extensions
     private fun startBleScan() {
         if (!hasRequiredRuntimePermissions()) {
             requestRelevantRuntimePermissions()
-        } else {
-            bleScanner.startScan(null, scanSettings, scanCallback)
         }
+        bleScanner.startScan(null, scanSettings, scanCallback)
+        isScanning = true
+
+    }
+    // Stops Bluetooth scan
+    @SuppressLint("MissingPermission")
+    private fun stopBleScan() {
+        if (!hasRequiredRuntimePermissions()) {
+            requestRelevantRuntimePermissions()
+        }
+            bleScanner.stopScan(scanCallback)
+            isScanning = false
     }
 
     // Instantiates the Bluetooth LE scanner
@@ -59,9 +76,32 @@ class MainActivity : ComponentActivity() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 if (ActivityCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED)
                     with(result.device) {
-                        Log.i("ScanCallback", "Found BLE device named ${name ?: "Unnamed"}, with address $address") // Returns Unnamed if device does not broadcast a name
+                        Log.i("ScanCallback", "Found BLE device named ${name ?: "Unnamed"} with address $address") // Returns Unnamed if device does not broadcast a name
+                        if (name == DEVICE_TO_CONNECT) {
+                            Log.w("ScanCallback", "Match found! Connecting to $name at $address")
+                            stopBleScan() // Keeps device from continuing to scan for Bluetooth devices after connection, which wastes resources
+                            connectGatt(this@MainActivity, false, gattCallback)
+                        }
                     }
             }
+    }
+
+    // Callback for gatt connection
+    @SuppressLint("MissingPermission")
+    private val gattCallback = object: BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            val deviceAddress = gatt.device.address
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
+                // Store reference to BluetoothGatt
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
+                gatt.close()
+            } else {
+                Log.w("BluetoothGattCallback", "Error when connecting to $deviceAddress: $status")
+                gatt.close()
+            }
+        }
     }
 
     // Requests that the user enable Bluetooth if it's not enabled
