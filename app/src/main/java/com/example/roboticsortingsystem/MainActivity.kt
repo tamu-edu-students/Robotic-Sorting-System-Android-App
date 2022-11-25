@@ -16,6 +16,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -87,6 +89,20 @@ class MainActivity : ComponentActivity() {
             }
     }
 
+    // Debug function used to discover services on connected Bluetooth devices
+    private fun BluetoothGatt.printGattTable() {
+        if (services.isEmpty()) {
+            Log.i("printGattTable", "No services found (may need to call discoverServices()")
+            return
+        }
+        services.forEach { service -> // Creates a unique entry for each service
+            val characteristicsTable = service.characteristics.joinToString ( // Table formatting
+                separator = "\n|--",
+                prefix = "|--"
+            ) { it.uuid.toString() }
+            Log.i("printGattTable", "\nService ${service.uuid}\nCharacteristics:\n$characteristicsTable") // Actually prints table to logcat
+        }
+    }
 
     // Callback for gatt connection
     @SuppressLint("MissingPermission")
@@ -95,13 +111,24 @@ class MainActivity : ComponentActivity() {
             val deviceAddress = gatt.device.address
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
-                // Store reference to BluetoothGatt
+                if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    Handler(Looper.getMainLooper()).post {
+                        gatt.discoverServices()
+                    }
+                }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
                 gatt.close()
             } else {
                 Log.w("BluetoothGattCallback", "Error when connecting to $deviceAddress: $status")
                 gatt.close()
+            }
+        }
+        // Set behavior when a service is discovered
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            with(gatt) {
+                Log.w("BluetoothGattCallback", "Discovered ${services.size} services for device ${device.name} at ${device.address}")
+                printGattTable() // Prints table of services
             }
         }
     }
