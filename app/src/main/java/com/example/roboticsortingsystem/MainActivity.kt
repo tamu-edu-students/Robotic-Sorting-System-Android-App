@@ -34,7 +34,7 @@ private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val RUNTIME_PERMISSION_REQUEST_CODE = 2
 private const val GATT_MAX_MTU_SIZE = 517 // as specified by Android source code
 // Sets name of Bluetooth device to automatically connect to
-private const val DEVICE_TO_CONNECT = "RoboticSortingSystemTest"
+private const val DEVICE_TO_CONNECT = "raspberrypi"
 
 class MainActivity : ComponentActivity() {
 
@@ -132,7 +132,9 @@ class MainActivity : ComponentActivity() {
                 Log.w("BluetoothGattCallback", "Discovered ${services.size} services for device ${device.name} at ${device.address}")
                 printGattTable() // Prints table of services
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
-                readRSSWeight(gatt) // Test of read functionality
+                // readRSSWeight(gatt) // Test of read functionality
+                writeRSSConfig(gatt, byteArrayOf(0x15)) // Test of write functionality
+                // readRSSConfig(gatt)
             }
         }
         // Request larger Maximum Transmission Unit (MTU)
@@ -159,6 +161,29 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        // Handle callback after write
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            with(characteristic) {
+                when (status) {
+                    BluetoothGatt.GATT_SUCCESS -> {
+                        Log.i("BluetoothGattCallback", "Wrote value ${value.toHexString()} to service $uuid")
+                    }
+                    BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH -> { // Invoked if data packet is bigger than MTU
+                        Log.e("BluetoothGattCallback", "Attempted write exceeded size of MTU")
+                    }
+                    BluetoothGatt.GATT_WRITE_NOT_PERMITTED -> {
+                        Log.e("BluetoothGattCallback", "Write to service $uuid not permitted")
+                    }
+                    else -> {
+                        Log.e("BluetoothGattCallback", "Write to characteristic of $uuid failed with error $status")
+                    }
+                }
+            }
+        }
     }
     // Functions that check if a characteristic is readable/writable
     fun BluetoothGattCharacteristic.containsProperty(property: Int) : Boolean {
@@ -174,16 +199,42 @@ class MainActivity : ComponentActivity() {
     // Convert values to hex string for reading characteristics
     fun ByteArray.toHexString(): String =
         joinToString(separator = " ", prefix = "0x") {String.format("%02X", it)}
-    // RSS services: UUID 0x2022, weight characteristic read-only (0x1234), configuration characteristic write/read (0x5678)
+    // RSS services: UUID e2d36f99-8909-4136-9a49-d825508b297b, weight characteristic read-only (0x1234), configuration characteristic write/read (0x5678)
     @SuppressLint("MissingPermission")
     private fun readRSSWeight(gatt: BluetoothGatt) {
         val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
-        val rssWeightUUID = UUID.fromString("00001234-0000-1000-8000-00805f9b34fb") // Weight characteristic UUID
+        val rssWeightUUID = UUID.fromString("00001234-0000-1000-8000-00805f9b34fb") // Weight characteristic UUID (with Bluetooth base UUID)
         val rssWeight = gatt.getService(rssUUID)?.getCharacteristic(rssWeightUUID)
         if (rssWeight?.isReadable() == true) {
             gatt.readCharacteristic(rssWeight)
         }
     }
+
+    @SuppressLint("MissingPermission")
+    private fun readRSSConfig(gatt: BluetoothGatt) {
+        val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
+        val rssConfigUUID = UUID.fromString("00005678-0000-1000-8000-00805f9b34fb") // Weight characteristic UUID (with Bluetooth base UUID)
+        val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
+        if (rssConfig?.isReadable() == true) {
+            gatt.readCharacteristic(rssConfig)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun writeRSSConfig(gatt: BluetoothGatt, payload: ByteArray) {
+        val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
+        val rssConfigUUID = UUID.fromString("00005678-0000-1000-8000-00805f9b34fb") // Configuration characteristic UUID w/ Bluetooth base
+        val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
+        val writeType = when {
+            rssConfig?.isWritable() == true -> BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT // Default write (with response)
+            rssConfig?.isWritableWithoutResponse() == true -> BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            else -> error("Cannot write configuration")
+        }
+        rssConfig.writeType = writeType // Sets type of write
+        rssConfig.value = payload // Sets data to write
+        gatt.writeCharacteristic(rssConfig) // Writes to peripheral
+    }
+
 
     // Requests that the user enable Bluetooth if it's not enabled
     private var startBluetoothIntentForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
