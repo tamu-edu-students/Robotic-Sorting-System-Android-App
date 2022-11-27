@@ -34,7 +34,7 @@ private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
 private const val RUNTIME_PERMISSION_REQUEST_CODE = 2
 private const val GATT_MAX_MTU_SIZE = 517 // as specified by Android source code
 // Sets name of Bluetooth device to automatically connect to
-private const val DEVICE_TO_CONNECT = "raspberrypi"
+private const val DEVICE_TO_CONNECT = "RoboticSortingSystemTest"
 
 class MainActivity : ComponentActivity() {
 
@@ -134,7 +134,6 @@ class MainActivity : ComponentActivity() {
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
                 // readRSSWeight(gatt) // Test of read functionality
                 writeRSSConfig(gatt, byteArrayOf(0x15)) // Test of write functionality
-                // readRSSConfig(gatt)
             }
         }
         // Request larger Maximum Transmission Unit (MTU)
@@ -171,6 +170,7 @@ class MainActivity : ComponentActivity() {
                 when (status) {
                     BluetoothGatt.GATT_SUCCESS -> {
                         Log.i("BluetoothGattCallback", "Wrote value ${value.toHexString()} to service $uuid")
+                        readRSSConfig(gatt) // Temporally spaced read test
                     }
                     BluetoothGatt.GATT_INVALID_ATTRIBUTE_LENGTH -> { // Invoked if data packet is bigger than MTU
                         Log.e("BluetoothGattCallback", "Attempted write exceeded size of MTU")
