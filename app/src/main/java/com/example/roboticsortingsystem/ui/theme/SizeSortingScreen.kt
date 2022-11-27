@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,8 +44,8 @@ fun SizeSortingScreen (
     modifier: Modifier = Modifier,
     onCancelButtonClicked: () -> Unit = {} // Allows the main RSSScreen to pass in cancel button behavior
 ) {
-    var size1Input by remember { mutableStateOf("") } // Passed to InputBox to display user text
-    var size2Input by remember { mutableStateOf("") } // TODO: make these stay when device rotated
+    var size1Input by rememberSaveable { mutableStateOf("") } // Passed to InputBox to display user text
+    var size2Input by rememberSaveable { mutableStateOf("") } // rememberSaveable: text stays when device rotated
     Column(
         modifier = Modifier
             .padding(16.dp)

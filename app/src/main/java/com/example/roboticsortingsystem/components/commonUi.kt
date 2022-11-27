@@ -1,5 +1,7 @@
 package com.example.roboticsortingsystem.components
 
+import android.content.Context
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +29,7 @@ fun ScreenSelectButton(
 ) {
     Button(
         onClick = onClick,
-        modifier.widthIn(min = 300.dp) // Temporary to make the screen look better: will make full-width later
+        modifier.widthIn(min = 350.dp) // Temporary to make the screen look better: will make full-width later
     ) {
         Text(stringResource(id = labelResourceId))
     }

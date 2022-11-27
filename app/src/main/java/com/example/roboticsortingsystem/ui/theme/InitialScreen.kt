@@ -14,7 +14,7 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
     modifier: Modifier = Modifier, // Passing a default modifier is good practice
     onSupportButtonClicked: () -> Unit = {}, // Handles navigation to the support screen when requested
     onMachineInfoButtonClicked: () -> Unit = {}, // Same for machine info screen
-    onConfigurationButtonClicked: () -> Unit = {}
+    onConfigurationButtonClicked: () -> Unit = {},
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
         modifier = modifier
