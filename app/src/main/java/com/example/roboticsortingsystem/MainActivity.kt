@@ -3,6 +3,7 @@ package com.example.roboticsortingsystem
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.PendingIntent.getActivity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
@@ -30,11 +31,13 @@ import com.example.roboticsortingsystem.bluetooth.requestRelevantRuntimePermissi
 import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
 import java.util.*
 
-private const val ENABLE_BLUETOOTH_REQUEST_CODE = 1
-private const val RUNTIME_PERMISSION_REQUEST_CODE = 2
 private const val GATT_MAX_MTU_SIZE = 517 // as specified by Android source code
 // Sets name of Bluetooth device to automatically connect to
-private const val DEVICE_TO_CONNECT = "RoboticSortingSystemTest"
+private const val DEVICE_TO_CONNECT = "Robotic Sorting System"
+// UUIDs for Robotic Sorting System service and characteristics
+private const val RSS_SERVICE_UUID = "4f5a4acc-6434-4d33-a791-589fdca0daf5"
+private const val RSS_WEIGHT_UUID = "4f5641bf-1119-4d1f-932d-fff7840ddc02"
+private const val RSS_CONFIG_UUID = "89097689-8bc2-44cb-9142-f17c71ed24f8"
 
 class MainActivity : ComponentActivity() {
 
@@ -132,8 +135,8 @@ class MainActivity : ComponentActivity() {
                 Log.w("BluetoothGattCallback", "Discovered ${services.size} services for device ${device.name} at ${device.address}")
                 printGattTable() // Prints table of services
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
-                // readRSSWeight(gatt) // Test of read functionality
-                writeRSSConfig(gatt, byteArrayOf(0x15)) // Test of write functionality
+                readRSSWeight(gatt) // Test of read functionality
+                // writeRSSConfig(gatt, byteArrayOf(0x15)) // Test of write functionality
             }
         }
         // Request larger Maximum Transmission Unit (MTU)
@@ -202,8 +205,8 @@ class MainActivity : ComponentActivity() {
     // RSS services: UUID e2d36f99-8909-4136-9a49-d825508b297b, weight characteristic read-only (0x1234), configuration characteristic write/read (0x5678)
     @SuppressLint("MissingPermission")
     private fun readRSSWeight(gatt: BluetoothGatt) {
-        val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
-        val rssWeightUUID = UUID.fromString("00001234-0000-1000-8000-00805f9b34fb") // Weight characteristic UUID (with Bluetooth base UUID)
+        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
+        val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
         val rssWeight = gatt.getService(rssUUID)?.getCharacteristic(rssWeightUUID)
         if (rssWeight?.isReadable() == true) {
             gatt.readCharacteristic(rssWeight)
@@ -212,8 +215,8 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     private fun readRSSConfig(gatt: BluetoothGatt) {
-        val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
-        val rssConfigUUID = UUID.fromString("00005678-0000-1000-8000-00805f9b34fb") // Weight characteristic UUID (with Bluetooth base UUID)
+        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
+        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
         val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
         if (rssConfig?.isReadable() == true) {
             gatt.readCharacteristic(rssConfig)
@@ -222,8 +225,8 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     private fun writeRSSConfig(gatt: BluetoothGatt, payload: ByteArray) {
-        val rssUUID = UUID.fromString("e2d36f99-8909-4136-9a49-d825508b297b") // RSS service UUID
-        val rssConfigUUID = UUID.fromString("00005678-0000-1000-8000-00805f9b34fb") // Configuration characteristic UUID w/ Bluetooth base
+        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
+        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
         val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
         val writeType = when {
             rssConfig?.isWritable() == true -> BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT // Default write (with response)
