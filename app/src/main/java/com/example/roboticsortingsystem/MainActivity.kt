@@ -3,17 +3,10 @@ package com.example.roboticsortingsystem
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.PendingIntent.getActivity
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothProfile
+import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -29,7 +22,9 @@ import androidx.core.content.ContextCompat
 import com.example.roboticsortingsystem.bluetooth.hasRequiredRuntimePermissions
 import com.example.roboticsortingsystem.bluetooth.requestRelevantRuntimePermissions
 import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 private const val GATT_MAX_MTU_SIZE = 517 // as specified by Android source code
 // Sets name of Bluetooth device to automatically connect to
@@ -39,13 +34,11 @@ private const val RSS_SERVICE_UUID = "4f5a4acc-6434-4d33-a791-589fdca0daf5"
 private const val RSS_WEIGHT_UUID = "4f5641bf-1119-4d1f-932d-fff7840ddc02"
 private const val RSS_CONFIG_UUID = "89097689-8bc2-44cb-9142-f17c71ed24f8"
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    // Instantiate the Bluetooth adapter and manager
-    private val bluetoothAdapter: BluetoothAdapter by lazy { // Lazy: only instantiated when needed
-        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothManager.adapter
-    }
+    @Inject
+    lateinit var bluetoothAdapter: BluetoothAdapter
 
     // Used to indicate whether Bluetooth scan is active
     private var isScanning = false
