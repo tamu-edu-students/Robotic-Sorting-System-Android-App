@@ -4,4 +4,5 @@ package com.example.roboticsortingsystem.bluetooth
 data class DataReadPackage(
     val configuration:Int,
     val weight:Int,
+    val connectionState: ConnectionState = ConnectionState.Uninitialized
 )

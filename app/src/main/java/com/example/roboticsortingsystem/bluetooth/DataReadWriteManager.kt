@@ -13,10 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.example.roboticsortingsystem.DEVICE_TO_CONNECT
-import com.example.roboticsortingsystem.GATT_MAX_MTU_SIZE
-import com.example.roboticsortingsystem.RSS_CONFIG_UUID
-import com.example.roboticsortingsystem.RSS_WEIGHT_UUID
+import com.example.roboticsortingsystem.*
 import com.example.roboticsortingsystem.util.Resource
 import com.example.roboticsortingsystem.bluetooth.DataReadPackage
 import kotlinx.coroutines.CoroutineScope
@@ -27,14 +24,13 @@ import java.util.*
 import javax.inject.Inject
 
 // Need to use Dagger to get current activity, Bluetooth adapter, and context
-class DataReadManager @Inject constructor(
-    private val activity: Activity,
+class DataReadWriteManager @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter,
     private val context: Context
 ) : DataReadInterface{
-    override val dataRead: MutableSharedFlow<Resource<DataReadPackage>>
-        // No value by default on launch
-        get() = MutableSharedFlow()
+
+    // Allows data to be emitted to the ViewModel (and update the Compose UI when it's received)
+    override val dataRead: MutableSharedFlow<Resource<DataReadPackage>> = MutableSharedFlow()
 
     // Bluetooth logic instantiated as needed
     private val bleScanner by lazy {
@@ -44,9 +40,6 @@ class DataReadManager @Inject constructor(
     // Starts Bluetooth scan (and ensures that the app has permission to do so)
     @SuppressLint("MissingPermission") // Prevents Android Studio from getting upset that there's no permission check here: they're in the Context extensions
     private fun startBleScan() {
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
-        }
         bleScanner.startScan(null, scanSettings, scanCallback)
         isScanning = true
 
@@ -55,9 +48,6 @@ class DataReadManager @Inject constructor(
     // Stops Bluetooth scan
     @SuppressLint("MissingPermission")
     private fun stopBleScan() {
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
-        }
         bleScanner.stopScan(scanCallback)
         isScanning = false
     }
@@ -80,10 +70,43 @@ class DataReadManager @Inject constructor(
                     Log.i("ScanCallback", "Found BLE device named ${name ?: "Unnamed"} with address $address") // Returns Unnamed if device does not broadcast a name
                     if (name == DEVICE_TO_CONNECT) {
                         Log.w("ScanCallback", "Match found! Connecting to $name at $address")
+                        coroutineScope.launch {
+                            dataRead.emit(Resource.Loading(message = "RSS found. Connecting..."))
+                        }
                         stopBleScan() // Keeps device from continuing to scan for Bluetooth devices after connection, which wastes resources
                         connectGatt(context, false, gattCallback)
                     }
                 }
+        }
+    }
+
+    // Functions that check if a characteristic is readable/writable
+    fun BluetoothGattCharacteristic.containsProperty(property: Int) : Boolean {
+        return properties and property != 0 // Gets properties for the characteristic function to interpret
+    }
+    fun BluetoothGattCharacteristic.isReadable(): Boolean =
+        containsProperty(BluetoothGattCharacteristic.PROPERTY_READ)
+    fun BluetoothGattCharacteristic.isWritable(): Boolean =
+        containsProperty(BluetoothGattCharacteristic.PROPERTY_WRITE)
+    fun BluetoothGattCharacteristic.isWritableWithoutResponse(): Boolean =
+        containsProperty(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
+
+    @SuppressLint("MissingPermission")
+    fun rssRead(
+        gatt: BluetoothGatt,
+    ) {
+        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
+        val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
+        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
+        val weightCharacteristic = gatt.getService(rssUUID).getCharacteristic(rssWeightUUID)
+        val configCharacteristic = gatt.getService(rssUUID).getCharacteristic(rssConfigUUID)
+
+
+        if (weightCharacteristic.isReadable()) { // Characteristic needs to be initialized and readable
+            gatt.readCharacteristic(weightCharacteristic) // Value is actually read in onCharacteristicRead, this just returns a boolean
+        }
+        if (configCharacteristic.isReadable()) {
+            gatt.readCharacteristic(configCharacteristic) // Not read: too fast?
         }
     }
 
@@ -114,12 +137,18 @@ class DataReadManager @Inject constructor(
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    coroutineScope.launch {
+                        dataRead.emit(Resource.Loading(message = "Discovering RSS services..."))
+                    }
                     Handler(Looper.getMainLooper()).post {
                         gatt.discoverServices()
                     }
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
+                coroutineScope.launch {
+                    dataRead.emit(Resource.Success(data = DataReadPackage(0, 0, ConnectionState.Disconnected)))
+                }
                 gatt.close()
             } else {
                 Log.w("BluetoothGattCallback", "Error when connecting to $deviceAddress: $status")
@@ -132,8 +161,7 @@ class DataReadManager @Inject constructor(
                 Log.w("BluetoothGattCallback", "Discovered ${services.size} services for device ${device.name} at ${device.address}")
                 printGattTable() // Prints table of services
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
-                // readRSSWeight(gatt) // Test of read functionality
-                // writeRSSConfig(gatt, byteArrayOf(0x15)) // Test of write functionality
+                rssRead(gatt) // Initial read to initialize ViewModel
             }
         }
         // Request larger Maximum Transmission Unit (MTU)
@@ -146,32 +174,17 @@ class DataReadManager @Inject constructor(
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
+            var rssConfig: Int = 0
+            var rssWeight: Int = 0
             with(characteristic) {
                 when (status) {
                     BluetoothGatt.GATT_SUCCESS -> { // Value read successfully
-                        when(uuid) {
-                            UUID.fromString(RSS_WEIGHT_UUID) -> {
-                                val readWeight = value[0].toInt() // value is a byte array with the weight value at index 0
-                                val dataReadPackage = DataReadPackage(
-                                    0, // No configuration value read
-                                    readWeight
-                                )
-                                coroutineScope.launch {
-                                    dataRead.emit(Resource.Success(data = dataReadPackage))
-                                }
-                            }
-                            UUID.fromString(RSS_CONFIG_UUID) -> {
-                                val readConfig = value[0].toInt()
-                                val dataReadPackage = DataReadPackage(
-                                    readConfig,
-                                    0 // No weight value read
-                                )
-                                coroutineScope.launch {
-                                    dataRead.emit(Resource.Success(data = dataReadPackage))
-                                }
-                            }
-                        }
                         Log.i("BluetoothGattCallback", "Read characteristic $uuid:\n${value.toHexString()}")
+                        if (uuid.toString() == RSS_WEIGHT_UUID) {
+                            rssWeight = value.first().toInt()
+                        } else {
+                            rssConfig = value.first().toInt()
+                        }
                     }
                     BluetoothGatt.GATT_READ_NOT_PERMITTED -> { // Read permission denied
                         Log.e("BluetoothGattCallback", "Read not permitted for $uuid")
@@ -180,6 +193,17 @@ class DataReadManager @Inject constructor(
                         Log.e("BluetoothGattCallback", "Read failed for $uuid with error $status")
                     }
                 }
+            }
+            // Push updated values to ViewModel
+            val readValues = DataReadPackage (
+                rssConfig,
+                rssWeight,
+                ConnectionState.Connected
+            )
+            coroutineScope.launch {
+                dataRead.emit(
+                    Resource.Success(data = readValues)
+                )
             }
         }
         // Handle callback after write
@@ -205,40 +229,41 @@ class DataReadManager @Inject constructor(
                 }
             }
         }
+
+        override fun onCharacteristicChanged( // Update ViewModel if a characteristic changes
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
+            super.onCharacteristicChanged(gatt, characteristic)
+            if (gatt != null) {
+                rssRead(gatt)
+            }
+        }
     }
 
     // Manage connection/reconnection as necessary
     @SuppressLint("MissingPermission")
     override fun reconnect() {
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
-        }
         gatt?.connect()
     }
 
     @SuppressLint("MissingPermission")
     override fun disconnect() {
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
-        }
         gatt?.disconnect()
     }
 
     @SuppressLint("MissingPermission")
-    override fun recieve() {
-        isScanning = true
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
+    override fun receive() {
+        coroutineScope.launch {
+            dataRead.emit(Resource.Loading(message = "Scanning for RSS BLE"))
         }
+        isScanning = true
         bleScanner.startScan(null, scanSettings, scanCallback)
 
     }
 
     @SuppressLint("MissingPermission")
     override fun closeConnection() {
-        if (!context.hasRequiredRuntimePermissions()) {
-            activity.requestRelevantRuntimePermissions()
-        }
         gatt?.close()
     }
 

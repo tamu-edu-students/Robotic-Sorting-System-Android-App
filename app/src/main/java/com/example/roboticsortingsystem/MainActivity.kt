@@ -4,23 +4,15 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.*
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.roboticsortingsystem.bluetooth.hasRequiredRuntimePermissions
-import com.example.roboticsortingsystem.bluetooth.requestRelevantRuntimePermissions
 import com.example.roboticsortingsystem.ui.theme.RoboticSortingSystemTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -39,59 +31,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var bluetoothAdapter: BluetoothAdapter
-
-    // Instantiates the Bluetooth LE scanner
-    private val bleScanner by lazy {
-        bluetoothAdapter.bluetoothLeScanner
-    }
-
-    // Functions that check if a characteristic is readable/writable
-    fun BluetoothGattCharacteristic.containsProperty(property: Int) : Boolean {
-        return properties and property != 0 // Gets properties for the characteristic function to interpret
-    }
-    fun BluetoothGattCharacteristic.isReadable(): Boolean =
-        containsProperty(BluetoothGattCharacteristic.PROPERTY_READ)
-    fun BluetoothGattCharacteristic.isWritable(): Boolean =
-        containsProperty(BluetoothGattCharacteristic.PROPERTY_WRITE)
-    fun BluetoothGattCharacteristic.isWritableWithoutResponse(): Boolean =
-        containsProperty(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
-
-
-    // RSS services: UUID e2d36f99-8909-4136-9a49-d825508b297b, weight characteristic read-only (0x1234), configuration characteristic write/read (0x5678)
-    @SuppressLint("MissingPermission")
-    private fun readRSSWeight(gatt: BluetoothGatt) {
-        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
-        val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
-        val rssWeight = gatt.getService(rssUUID)?.getCharacteristic(rssWeightUUID)
-        if (rssWeight?.isReadable() == true) {
-            gatt.readCharacteristic(rssWeight)
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun readRSSConfig(gatt: BluetoothGatt) {
-        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
-        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
-        val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
-        if (rssConfig?.isReadable() == true) {
-            gatt.readCharacteristic(rssConfig)
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun writeRSSConfig(gatt: BluetoothGatt, payload: ByteArray) {
-        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
-        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
-        val rssConfig = gatt.getService(rssUUID)?.getCharacteristic(rssConfigUUID)
-        val writeType = when {
-            rssConfig?.isWritable() == true -> BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT // Default write (with response)
-            rssConfig?.isWritableWithoutResponse() == true -> BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-            else -> error("Cannot write configuration")
-        }
-        rssConfig.writeType = writeType // Sets type of write
-        rssConfig.value = payload // Sets data to write
-        gatt.writeCharacteristic(rssConfig) // Writes to peripheral
-    }
 
 
     // Requests that the user enable Bluetooth if it's not enabled
@@ -125,16 +64,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RoboticSortingSystemTheme {
-                    RSSApp()
+                    RSSApp(onBluetoothStateChanged = { showBluetoothDialog() })
             }
         }
     }
 
     // Overrides start function to ensure Bluetooth is enabled any time the app is started or returned to
-    /* override fun onStart() {
+    override fun onStart() {
         super.onStart()
         showBluetoothDialog()
-        startBleScan()
-    } */
+    }
 
 }

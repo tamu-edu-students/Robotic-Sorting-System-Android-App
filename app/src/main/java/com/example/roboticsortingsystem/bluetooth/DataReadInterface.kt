@@ -14,7 +14,7 @@ interface DataReadInterface {
 
     fun disconnect()
 
-    fun recieve()
+    fun receive()
 
     fun closeConnection()
 

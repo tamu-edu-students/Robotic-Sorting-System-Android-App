@@ -53,7 +53,8 @@ fun RSSAppTopBar(
 
 @Composable
 fun RSSApp( // Controls navigation between screens
-    modifier: Modifier = Modifier // Good practice to pass a default modifier
+    modifier: Modifier = Modifier, // Good practice to pass a default modifier
+    onBluetoothStateChanged: () -> Unit // Allows interaction with Bluetooth in UI
 ) {
     val navController = rememberNavController() // Initializes NavController used to move between screens
     val backStackEntry by navController.currentBackStackEntryAsState() // Stores the previous screen to be passed to the nav bar (to determine if backwards navigation is possible)
@@ -85,7 +86,7 @@ fun RSSApp( // Controls navigation between screens
                 SupportScreen()
             }
             composable(route = RSSScreen.MachineInfo.name) {
-                MachineInfoScreen()
+                MachineInfoScreen(modifier, onBluetoothStateChanged)
             }
             composable(route = RSSScreen.Configuration.name) {
                 ConfigurationScreen(
@@ -118,5 +119,5 @@ private fun returnToStart(
 @Preview
 @Composable
 fun RSSAppPreview() {
-    RSSApp()
+    // RSSApp()
 }

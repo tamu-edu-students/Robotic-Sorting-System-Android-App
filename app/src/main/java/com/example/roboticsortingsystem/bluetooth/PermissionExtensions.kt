@@ -47,3 +47,20 @@ fun Activity.requestRelevantRuntimePermissions() {
         }
     }
 }
+
+// Provides permissions status to UI
+object PermissionState {
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+ BLE permissions
+        listOf(
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    } else { // Android 9-11 BLE permissions
+        listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    }
+}
