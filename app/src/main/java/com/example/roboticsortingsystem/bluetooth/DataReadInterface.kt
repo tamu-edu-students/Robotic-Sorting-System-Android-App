@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 
 interface DataReadInterface {
 
-    val dataRead: MutableSharedFlow<Resource<DataReadPackage>>
+    val configRead: MutableSharedFlow<Resource<ConfigurationPackage>>
+    val weightRead: MutableSharedFlow<Resource<WeightPackage>>
+    val connectionStateRead: MutableSharedFlow<Resource<ConnectionStatePackage>>
 
     fun reconnect()
 

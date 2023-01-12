@@ -11,16 +11,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings.Global
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.example.roboticsortingsystem.*
 import com.example.roboticsortingsystem.util.Resource
-import com.example.roboticsortingsystem.bluetooth.DataReadPackage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedQueue
 import javax.inject.Inject
 
 // Need to use Dagger to get current activity, Bluetooth adapter, and context
@@ -30,7 +29,9 @@ class DataReadWriteManager @Inject constructor(
 ) : DataReadInterface{
 
     // Allows data to be emitted to the ViewModel (and update the Compose UI when it's received)
-    override val dataRead: MutableSharedFlow<Resource<DataReadPackage>> = MutableSharedFlow()
+    override val configRead: MutableSharedFlow<Resource<ConfigurationPackage>> = MutableSharedFlow()
+    override val weightRead: MutableSharedFlow<Resource<WeightPackage>> = MutableSharedFlow()
+    override val connectionStateRead: MutableSharedFlow<Resource<ConnectionStatePackage>> = MutableSharedFlow()
 
     // Bluetooth logic instantiated as needed
     private val bleScanner by lazy {
@@ -71,7 +72,7 @@ class DataReadWriteManager @Inject constructor(
                     if (name == DEVICE_TO_CONNECT) {
                         Log.w("ScanCallback", "Match found! Connecting to $name at $address")
                         coroutineScope.launch {
-                            dataRead.emit(Resource.Loading(message = "RSS found. Connecting..."))
+                            connectionStateRead.emit(Resource.Loading(message = "RSS found. Connecting..."))
                         }
                         stopBleScan() // Keeps device from continuing to scan for Bluetooth devices after connection, which wastes resources
                         connectGatt(context, false, gattCallback)
@@ -98,16 +99,8 @@ class DataReadWriteManager @Inject constructor(
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
-        val weightCharacteristic = gatt.getService(rssUUID).getCharacteristic(rssWeightUUID)
-        val configCharacteristic = gatt.getService(rssUUID).getCharacteristic(rssConfigUUID)
-
-
-        if (weightCharacteristic.isReadable()) { // Characteristic needs to be initialized and readable
-            gatt.readCharacteristic(weightCharacteristic) // Value is actually read in onCharacteristicRead, this just returns a boolean
-        }
-        if (configCharacteristic.isReadable()) {
-            gatt.readCharacteristic(configCharacteristic) // Not read: too fast?
-        }
+        addOperationToQueue(characteristicRead(gatt, rssUUID, rssWeightUUID)) // Read weight
+        addOperationToQueue(characteristicRead(gatt, rssUUID, rssConfigUUID))
     }
 
     // Debug function used to discover services on connected Bluetooth devices
@@ -138,7 +131,7 @@ class DataReadWriteManager @Inject constructor(
                 Log.w("BluetoothGattCallback", "Successfully connected to $deviceAddress")
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     coroutineScope.launch {
-                        dataRead.emit(Resource.Loading(message = "Discovering RSS services..."))
+                        configRead.emit(Resource.Loading(message = "Discovering RSS services..."))
                     }
                     Handler(Looper.getMainLooper()).post {
                         gatt.discoverServices()
@@ -147,7 +140,7 @@ class DataReadWriteManager @Inject constructor(
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.w("BluetoothGattCallback", "Successfully disconnected from $deviceAddress")
                 coroutineScope.launch {
-                    dataRead.emit(Resource.Success(data = DataReadPackage(0, 0, ConnectionState.Disconnected)))
+                    connectionStateRead.emit(Resource.Success(ConnectionStatePackage(ConnectionState.Disconnected)))
                 }
                 gatt.close()
             } else {
@@ -174,16 +167,23 @@ class DataReadWriteManager @Inject constructor(
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
-            var rssConfig: Int = 0
-            var rssWeight: Int = 0
             with(characteristic) {
                 when (status) {
                     BluetoothGatt.GATT_SUCCESS -> { // Value read successfully
                         Log.i("BluetoothGattCallback", "Read characteristic $uuid:\n${value.toHexString()}")
                         if (uuid.toString() == RSS_WEIGHT_UUID) {
-                            rssWeight = value.first().toInt()
+                            val rssWeight = value.first().toInt()
+                            val weightCapsule = WeightPackage(rssWeight) // Puts the weight in a weightPackage ("capsule") to go to the ViewModel
+                            coroutineScope.launch {
+                                weightRead.emit(Resource.Success(weightCapsule))
+                            }
+
                         } else {
-                            rssConfig = value.first().toInt()
+                            val rssConfig = value.first().toInt()
+                            val configCapsule = ConfigurationPackage(rssConfig)
+                            coroutineScope.launch {
+                                configRead.emit(Resource.Success(configCapsule))
+                            }
                         }
                     }
                     BluetoothGatt.GATT_READ_NOT_PERMITTED -> { // Read permission denied
@@ -194,16 +194,8 @@ class DataReadWriteManager @Inject constructor(
                     }
                 }
             }
-            // Push updated values to ViewModel
-            val readValues = DataReadPackage (
-                rssConfig,
-                rssWeight,
-                ConnectionState.Connected
-            )
-            coroutineScope.launch {
-                dataRead.emit(
-                    Resource.Success(data = readValues)
-                )
+            if (pendingOperation is characteristicRead) { // Callback is complete: indicate to queue that a read operation is done
+                endOfOperation()
             }
         }
         // Handle callback after write
@@ -229,16 +221,6 @@ class DataReadWriteManager @Inject constructor(
                 }
             }
         }
-
-        override fun onCharacteristicChanged( // Update ViewModel if a characteristic changes
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?
-        ) {
-            super.onCharacteristicChanged(gatt, characteristic)
-            if (gatt != null) {
-                rssRead(gatt)
-            }
-        }
     }
 
     // Manage connection/reconnection as necessary
@@ -255,7 +237,7 @@ class DataReadWriteManager @Inject constructor(
     @SuppressLint("MissingPermission")
     override fun receive() {
         coroutineScope.launch {
-            dataRead.emit(Resource.Loading(message = "Scanning for RSS BLE"))
+            connectionStateRead.emit(Resource.Loading(message = "Scanning for RSS BLE"))
         }
         isScanning = true
         bleScanner.startScan(null, scanSettings, scanCallback)
@@ -267,4 +249,62 @@ class DataReadWriteManager @Inject constructor(
         gatt?.close()
     }
 
+
+    // Queue functions
+    private val operationQueue = ConcurrentLinkedQueue<BLEOperation>() // Creates a queue of BLEOperations with helpful prebuilt methods
+    private var pendingOperation: BLEOperation? = null // Stores next operation in queue
+
+    // Add to queue
+    @Synchronized // Prevents other functions from being run in parallel with this function, preventing temporal issues
+    private fun addOperationToQueue (operation: BLEOperation) {
+        operationQueue.add(operation)
+        if (pendingOperation == null) {
+            nextOperation() // Move on to the pending operation if there is one
+        }
+    }
+
+    // Execute the operation on the top of the stack (first-in-first-out system)
+    @Synchronized
+    @SuppressLint("MissingPermission")
+    private fun nextOperation() {
+        // Return if another operation is already executing
+        if (pendingOperation != null) {
+            Log.e("nextOperation", "Error: attempted to call nextOperation during an operation execution")
+            return
+        }
+        // Return if the operation queue is empty
+        val operation = operationQueue.poll() ?: run {
+            Log.i("nextOperation","nextOperation() called with nothing on queue: returning")
+            return
+        }
+        // Otherwise, assign pendingOperation to operation on top of stack and execute it
+        pendingOperation = operation
+
+        when (operation) {
+            is characteristicRead -> with(operation){
+                val characteristicToRead = gatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
+                if (characteristicToRead != null) {
+                    if (characteristicToRead.isReadable()) {
+                        gatt.readCharacteristic(characteristicToRead)
+                    } else {
+                        Log.e("nextOperation", "Characteristic with UUID $characteristicUUID is not readable")
+                    }
+                } else {
+                    Log.e("nextOperation", "Did not find characteristic with UUID $characteristicUUID")
+                }
+                // Call to endOfOperation() is at end of onCharacteristicRead() callback
+            }
+        }
+    }
+
+    // Notify queue that an operation has completed
+    @Synchronized
+    private fun endOfOperation() {
+        Log.d("DataReadWriteManager", "End of $pendingOperation")
+        pendingOperation = null
+        // Move to next operation if there is one
+        if (operationQueue.isNotEmpty()) {
+            nextOperation()
+        }
+    }
 }

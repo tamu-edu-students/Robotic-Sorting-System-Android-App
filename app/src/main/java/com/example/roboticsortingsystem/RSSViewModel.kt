@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.roboticsortingsystem.bluetooth.ConnectionState
 import com.example.roboticsortingsystem.bluetooth.DataReadInterface
-import com.example.roboticsortingsystem.bluetooth.DataReadPackage
 import com.example.roboticsortingsystem.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,12 +32,29 @@ class RSSViewModel @Inject constructor(
 
     private fun subscribeToChanges() { // Updates ViewModel every time the read value changes
         viewModelScope.launch {
-            dataReadInterface.dataRead.collect { result ->
+            dataReadInterface.configRead.collect { result -> // Store configuration as needed
                 when (result) {
-                    is Resource.Success -> { // If everything works right, store the received weight and configuration values in the ViewModel
-                        weight = result.data.weight
+                    is Resource.Success -> {
                         configuration = result.data.configuration
-                        connectionState = result.data.connectionState
+                        connectionState = ConnectionState.Connected
+                    }
+                    is Resource.Loading -> {
+                        initializingMessage = result.message // Allows a loading message while the connection is being established
+                        connectionState = ConnectionState.Initializing
+                    }
+                    is Resource.Error -> {
+                        errorMessage = result.errorMessage // Show an error message if there's an error
+                        connectionState = ConnectionState.Uninitialized
+                    }
+                }
+            }
+        }
+        viewModelScope.launch {
+            dataReadInterface.weightRead.collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        weight = result.data.weight
+                        connectionState = ConnectionState.Connected
                     }
                     is Resource.Loading -> {
                         initializingMessage = result.message // Allows a loading message while the connection is being established
