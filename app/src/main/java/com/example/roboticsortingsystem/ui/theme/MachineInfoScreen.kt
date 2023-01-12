@@ -50,7 +50,7 @@ fun MachineInfoScreen(
     onBluetoothStateChanged: () -> Unit,
     viewModel: RSSViewModel = hiltViewModel() // Exposes Bluetooth data from the underlying Bluetooth framework via ViewModel
 ) {
-    // SystemBroadcastReceiver listens for state changes from the BluetoothAdapter (e.g. user turns off Bluetooth) 
+    // SystemBroadcastReceiver listens for state changes from the BluetoothAdapter (e.g. user turns off Bluetooth)
     // and launches a re-activation prompt from the passed-in onBluetoothStateChanged function
     SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED) { bluetoothState ->
         val action = bluetoothState?.action ?: return@SystemBroadcastReceiver // return if bluetoothState does not exist
@@ -96,13 +96,6 @@ fun MachineInfoScreen(
             }
         }
     }
-
-    /* TODO: add functionality that shows diagnostic info from the machine
-    * Such as:
-    * - Current color sensed
-    * - Current weight sensed for each bin
-    * - Current size sensed
-    * */
 
     // This is a placeholder: actual info will go here during integration in 404
     // Nested columns ensure that arrangement works correctly
