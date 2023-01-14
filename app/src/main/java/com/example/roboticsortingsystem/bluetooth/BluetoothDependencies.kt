@@ -29,7 +29,6 @@ object BluetoothDependencies {
     @Provides
     @Singleton
     fun provideDataReadInterface(
-        // Can't inject activity into a ViewModel. how else can this work?
         @ApplicationContext context: Context,
         bluetoothAdapter: BluetoothAdapter
     ):DataReadInterface {

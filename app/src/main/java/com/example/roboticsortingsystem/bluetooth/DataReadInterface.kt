@@ -20,4 +20,5 @@ interface DataReadInterface {
 
     fun closeConnection()
 
+    fun write(config: Int) // Necessary to pass int to write from ViewModel
 }

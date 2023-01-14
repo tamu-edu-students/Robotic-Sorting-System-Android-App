@@ -2,7 +2,6 @@ package com.example.roboticsortingsystem.bluetooth
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -11,9 +10,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings.Global
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.roboticsortingsystem.*
 import com.example.roboticsortingsystem.util.Resource
 import kotlinx.coroutines.*
@@ -25,7 +26,7 @@ import javax.inject.Inject
 // Need to use Dagger to get current activity, Bluetooth adapter, and context
 class DataReadWriteManager @Inject constructor(
     private val bluetoothAdapter: BluetoothAdapter,
-    private val context: Context
+    private val context: Context,
 ) : DataReadInterface{
 
     // Allows data to be emitted to the ViewModel (and update the Compose UI when it's received)
@@ -94,13 +95,25 @@ class DataReadWriteManager @Inject constructor(
 
     @SuppressLint("MissingPermission")
     fun rssRead(
-        gatt: BluetoothGatt,
+        gatt: BluetoothGatt
     ) {
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
         addOperationToQueue(characteristicRead(gatt, rssUUID, rssWeightUUID)) // Read weight
         addOperationToQueue(characteristicRead(gatt, rssUUID, rssConfigUUID))
+    }
+
+    @SuppressLint("MissingPermission")
+    fun rssWrite(
+        gatt: BluetoothGatt,
+        configFromViewModel: Int
+    ) {
+        val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
+        val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
+        // Write configuration
+        addOperationToQueue(characteristicWrite(gatt, rssUUID, rssConfigUUID, configFromViewModel))
+        // Cannot write weight
     }
 
     // Debug function used to discover services on connected Bluetooth devices
@@ -154,6 +167,7 @@ class DataReadWriteManager @Inject constructor(
                 Log.w("BluetoothGattCallback", "Discovered ${services.size} services for device ${device.name} at ${device.address}")
                 printGattTable() // Prints table of services
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
+                this@DataReadWriteManager.gatt = gatt // Sets DataReadWriteManager-level gatt variable so other functions can use it
                 rssRead(gatt) // Initial read to initialize ViewModel
             }
         }
@@ -220,6 +234,9 @@ class DataReadWriteManager @Inject constructor(
                     }
                 }
             }
+            if (pendingOperation is characteristicWrite) { // Indicates to queue that write is complete
+                endOfOperation()
+            }
         }
     }
 
@@ -235,7 +252,7 @@ class DataReadWriteManager @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    override fun receive() {
+    override fun receive() { // Starts scan for BLE devices
         coroutineScope.launch {
             connectionStateRead.emit(Resource.Loading(message = "Scanning for RSS BLE"))
         }
@@ -249,6 +266,10 @@ class DataReadWriteManager @Inject constructor(
         gatt?.close()
     }
 
+    @SuppressLint("MissingPermission")
+    override fun write(config: Int) {
+        gatt?.let { rssWrite(it, config) } // Check if gatt is null before passing it as a parameter
+    }
 
     // Queue functions
     private val operationQueue = ConcurrentLinkedQueue<BLEOperation>() // Creates a queue of BLEOperations with helpful prebuilt methods
@@ -281,7 +302,7 @@ class DataReadWriteManager @Inject constructor(
         pendingOperation = operation
 
         when (operation) {
-            is characteristicRead -> with(operation){
+            is characteristicRead -> with (operation) {
                 val characteristicToRead = gatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
                 if (characteristicToRead != null) {
                     if (characteristicToRead.isReadable()) {
@@ -293,6 +314,28 @@ class DataReadWriteManager @Inject constructor(
                     Log.e("nextOperation", "Did not find characteristic with UUID $characteristicUUID")
                 }
                 // Call to endOfOperation() is at end of onCharacteristicRead() callback
+            }
+            is characteristicWrite -> with (operation) {
+                val payloadValue = writeValue.toByte()
+                val payload = byteArrayOf(payloadValue) // BLE uses byteArrays: this puts the value in the first position
+
+                payload[0] = payloadValue
+                val characteristicToWrite = gatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
+                if (characteristicToWrite != null) {
+                    val writeType = when { // Set write type based on whether the characteristic is writable w/ a response or not
+                        characteristicToWrite.isWritable() -> BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                        characteristicToWrite.isWritableWithoutResponse() -> BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                        else -> { Log.e("nextOperation", "Cannot write to $characteristicUUID") }
+                    }
+                    // Convert write value to byteArray to write
+                    characteristicToWrite.writeType = writeType
+                    // Perform the write
+                    characteristicToWrite.value = payload
+                    gatt.writeCharacteristic(characteristicToWrite)
+                } else {
+                    Log.e("nextOperation", "Did not find characteristic with UUID $characteristicUUID to write")
+                }
+                // Call to endOfOperation() is at end of onCharacteristicWrite() callback
             }
         }
     }

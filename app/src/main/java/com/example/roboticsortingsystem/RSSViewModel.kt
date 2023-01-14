@@ -9,10 +9,6 @@ import com.example.roboticsortingsystem.bluetooth.ConnectionState
 import com.example.roboticsortingsystem.bluetooth.DataReadInterface
 import com.example.roboticsortingsystem.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -83,6 +79,10 @@ class RSSViewModel @Inject constructor(
         errorMessage = null
         subscribeToChanges() // Allows ViewModel to get BLE results
         dataReadInterface.receive() // Starts the Bluetooth scan
+    }
+
+    fun writeToRSS() {
+        dataReadInterface.write(configuration)
     }
 
     // Handle case where the ViewModel is cleared for whatever reason

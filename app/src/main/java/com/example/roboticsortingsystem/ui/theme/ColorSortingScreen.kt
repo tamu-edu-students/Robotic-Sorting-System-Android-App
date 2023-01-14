@@ -154,7 +154,6 @@ fun ColorSortingScreen(
 
     // UI
     var color1Input by remember { mutableStateOf("") } // Stores user's chosen colors
-    var color2Input by remember { mutableStateOf("") }
     var currentColor = ""
     if (bleConnectionState == ConnectionState.Uninitialized) {
         currentColor = "Reading configuration value..."
@@ -170,6 +169,27 @@ fun ColorSortingScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
+
+        // Color 1 selection
+        Text(
+            text = stringResource(id = R.string.color_color1),
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp
+        )
+        Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
+        ColorButtons(onSelectionChanged = {
+            when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel
+                "Red" -> { viewModel.configuration = 10 }
+                "Orange" -> { viewModel.configuration = 11 }
+                "Yellow" -> { viewModel.configuration = 12 }
+                "Green" -> { viewModel.configuration = 13 }
+                "Purple" -> { viewModel.configuration = 14 }
+                "Brown" -> { viewModel.configuration = 15 }
+                else -> {} // Don't change anything if the returned color isn't valid
+            }
+        })
+        // Can add Color 2 here if necessary
+
         // Persistent column for current color
         Column(
             modifier = Modifier
@@ -184,18 +204,13 @@ fun ColorSortingScreen(
                 fontStyle = FontStyle.Italic
             )
         }
-        Spacer(Modifier.height(16.dp))
-        // Color 1 selection
         Text(
-            text = stringResource(id = R.string.color_color1),
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp
+            fontSize = 12.sp,
+            text = "Changes are sent to the RSS automatically upon selection."
         )
-        Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
-        ColorButtons()
-        // Can add Color 2 here if necessary
+        // The changes apply automatically, but these buttons may be useful in the future
         ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
-        ConfigurationApplyButton(onClick = { /*TODO*/ })
+        ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Tells the ViewModel to write to the RSS
     }
 }
 
