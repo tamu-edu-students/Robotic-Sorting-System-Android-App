@@ -204,11 +204,6 @@ fun ColorSortingScreen(
                 fontStyle = FontStyle.Italic
             )
         }
-        Text(
-            fontSize = 12.sp,
-            text = "Changes are sent to the RSS automatically upon selection."
-        )
-        // The changes apply automatically, but these buttons may be useful in the future
         ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
         ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Tells the ViewModel to write to the RSS
     }

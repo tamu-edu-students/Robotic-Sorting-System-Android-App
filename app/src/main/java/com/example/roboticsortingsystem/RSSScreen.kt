@@ -96,7 +96,8 @@ fun RSSApp( // Controls navigation between screens
             }
             composable(route = RSSScreen.SizeSorting.name) {
                 SizeSortingScreen(
-                    onCancelButtonClicked = { returnToStart(navController) }
+                    onCancelButtonClicked = { returnToStart(navController) },
+                    onBluetoothStateChanged = onBluetoothStateChanged
                 )
             }
             composable(route = RSSScreen.ColorSorting.name) {
