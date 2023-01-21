@@ -168,7 +168,7 @@ fun SizeSortingScreen (
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Current color: $currentSize",
+                text = "Current size: $currentSize",
                 textAlign = TextAlign.Center,
                 fontSize = 18.sp,
                 fontStyle = FontStyle.Italic
