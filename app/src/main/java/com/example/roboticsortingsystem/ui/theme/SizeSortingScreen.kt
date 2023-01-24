@@ -63,6 +63,7 @@ fun sizeIn(raw: UInt) : String {
 }
 
 // Converts from user input string to int that goes to the ViewModel
+// TODO: make this not break everything
 fun sizeOut(raw: String): UInt {
     return if (raw.toInt() > 9) {
         Log.e("sizeOut","Error: could not write input (out of range). Writing 0...")
@@ -152,7 +153,7 @@ fun SizeSortingScreen (
             entry = size1Input,
             onValueChange = {
                 size1Input = it // Shows change to user
-                viewModel.configuration = sizeOut(it) }, // Stores user input to ViewModel configuration
+                viewModel.configuration = it.toUInt() }, // Stores user input to ViewModel configuration
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
         )
         Spacer(modifier = Modifier.height(16.dp))
