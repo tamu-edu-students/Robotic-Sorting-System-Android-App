@@ -21,9 +21,9 @@ class RSSViewModel @Inject constructor(
         private set
     var errorMessage by mutableStateOf<String?>(null)
         private set
-    var weight by mutableStateOf(0)
+    var weight by mutableStateOf(0u) // u = unsigned: tells weight to expect a UInt
         private set // User should not write weight values
-    var configuration by mutableStateOf(0)
+    var configuration by mutableStateOf(0u)
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
     private fun subscribeToChanges() { // Updates ViewModel every time the read value changes

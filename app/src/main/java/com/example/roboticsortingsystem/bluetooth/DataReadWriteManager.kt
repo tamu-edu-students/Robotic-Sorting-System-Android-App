@@ -107,7 +107,7 @@ class DataReadWriteManager @Inject constructor(
     @SuppressLint("MissingPermission")
     fun rssWrite(
         gatt: BluetoothGatt,
-        configFromViewModel: Int
+        configFromViewModel: UInt
     ) {
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
@@ -186,14 +186,14 @@ class DataReadWriteManager @Inject constructor(
                     BluetoothGatt.GATT_SUCCESS -> { // Value read successfully
                         Log.i("BluetoothGattCallback", "Read characteristic $uuid:\n${value.toHexString()}")
                         if (uuid.toString() == RSS_WEIGHT_UUID) {
-                            val rssWeight = value.first().toInt()
+                            val rssWeight = value.first().toUInt()
                             val weightCapsule = WeightPackage(rssWeight) // Puts the weight in a weightPackage ("capsule") to go to the ViewModel
                             coroutineScope.launch {
                                 weightRead.emit(Resource.Success(weightCapsule))
                             }
 
                         } else {
-                            val rssConfig = value.first().toInt()
+                            val rssConfig = value.first().toUInt()
                             val configCapsule = ConfigurationPackage(rssConfig)
                             coroutineScope.launch {
                                 configRead.emit(Resource.Success(configCapsule))
@@ -267,7 +267,7 @@ class DataReadWriteManager @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    override fun write(config: Int) {
+    override fun write(config: UInt) {
         gatt?.let { rssWrite(it, config) } // Check if gatt is null before passing it as a parameter
     }
 

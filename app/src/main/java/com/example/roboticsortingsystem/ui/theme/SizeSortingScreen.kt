@@ -52,9 +52,10 @@ fun InputBox(
 }
 
 // Converts raw numbers from ViewModel to an easily displayed string
-fun sizeIn(raw: Int) : String {
-    return if (raw % 100 != 1) { // If the first digit is 1, the machine is currently configured for color
-        "$raw in."
+fun sizeIn(raw: UInt) : String {
+    val rawInt = raw.toInt()
+    return if (rawInt % 100 != 1) { // If the first digit is 1, the machine is currently configured for color
+        "$rawInt cm."
     }
     else {
         "Currently configured for color"
@@ -62,12 +63,12 @@ fun sizeIn(raw: Int) : String {
 }
 
 // Converts from user input string to int that goes to the ViewModel
-fun sizeOut(raw: String): Int {
+fun sizeOut(raw: String): UInt {
     return if (raw.toInt() > 9) {
         Log.e("sizeOut","Error: could not write input (out of range). Writing 0...")
-        0 // Returns 0 if the input is out of bounds, which can be handled as an error
+        0u // Returns 0 if the input is out of bounds, which can be handled as an error
     } else {
-        raw.toInt()
+        raw.toUInt()
     }
 }
 

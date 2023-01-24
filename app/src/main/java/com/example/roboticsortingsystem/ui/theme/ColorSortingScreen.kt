@@ -31,7 +31,6 @@ import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 // Creates column of radio buttons for color choice (should be called from inside a column)
 @Composable
@@ -77,10 +76,11 @@ fun ColorButtons(
 }
 
 // Translates the raw value received from the RSS to the current color
-fun colorIn(raw: Int) : String {
+fun colorIn(raw: UInt) : String {
+    val rawInt = raw.toInt() // In Kotlin, != can't use a UInt
     // If the first digit is 0, the machine is currently configured for size
-    if (raw % 100 != 0) {
-        when (raw % 10) { // The second digit corresponds to a color
+    if (rawInt % 100 != 0) {
+        when (rawInt % 10) { // The second digit corresponds to a color
             0 -> { return "Red" }
             1 -> { return "Orange"}
             2 -> { return "Yellow"}
@@ -179,12 +179,12 @@ fun ColorSortingScreen(
         Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
         ColorButtons(onSelectionChanged = {
             when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel
-                "Red" -> { viewModel.configuration = 10 }
-                "Orange" -> { viewModel.configuration = 11 }
-                "Yellow" -> { viewModel.configuration = 12 }
-                "Green" -> { viewModel.configuration = 13 }
-                "Purple" -> { viewModel.configuration = 14 }
-                "Brown" -> { viewModel.configuration = 15 }
+                "Red" -> { viewModel.configuration = 10u }
+                "Orange" -> { viewModel.configuration = 11u }
+                "Yellow" -> { viewModel.configuration = 12u }
+                "Green" -> { viewModel.configuration = 13u }
+                "Purple" -> { viewModel.configuration = 14u }
+                "Brown" -> { viewModel.configuration = 15u }
                 else -> {} // Don't change anything if the returned color isn't valid
             }
         })
