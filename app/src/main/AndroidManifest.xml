@@ -4,21 +4,15 @@
 
     <!-- Android 12+ Bluetooth permissions -->
     <!-- Scans for Bluetooth devices without using location (and asserts such) -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="s"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
     <!-- Allows interaction with connected Bluetooth devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
     <!-- Android 9-11 Bluetooth permissions -->
-    <uses-permission android:name="android.permission.BLUETOOTH"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
-        android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     
     <!-- Prevents the app from showing up on the Play Store for Android devices that don't support Bluetooth LE -->
     <uses-feature
@@ -26,6 +20,7 @@
         android:required="true"/>
 
     <application
+        android:name=".RSSApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
