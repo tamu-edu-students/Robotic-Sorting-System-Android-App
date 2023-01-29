@@ -152,30 +152,38 @@ fun SizeSortingScreen (
             verticalArrangement = Arrangement.Top
         ) {
             // Size 1 input box
-            InputBox(
-                label = R.string.size_size1_box_label,
-                entry = size1Input,
-                onValueChange = {
-                    if (it == "") { // Prevents crash when clearing the input field (due to trying to set a null config value in the ViewModel)
-                        size1Input = "" // Shows an empty box
-                        viewModel.configuration = byteArrayOf(1, 1)
-                    }
-                    else if (it.toInt() < RSS_MAX_SIZE) {
-                        size1Input = it // Shows change to user
-                        viewModel.configuration = byteArrayOf(1, it.toByte()) // Stores user input to ViewModel configuration. 1 = sorting by size
-                    } else {
-                        size1Input = RSS_MAX_SIZE.toString()
-                        viewModel.configuration = byteArrayOf(1, RSS_MAX_SIZE.toByte())
-                        showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
-                    }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(id = R.string.size_size1_solo_box_info),
-                textAlign = TextAlign.Center
-            )
+            // Only show if connected to RSS
+            if (bleConnectionState == ConnectionState.Connected) {
+                InputBox(
+                    label = R.string.size_size1_box_label,
+                    entry = size1Input,
+                    onValueChange = {
+                        if (it == "") { // Prevents crash when clearing the input field (due to trying to set a null config value in the ViewModel)
+                            size1Input = "" // Shows an empty box
+                            viewModel.configuration = byteArrayOf(1, 1)
+                        }
+                        else if (it.toInt() < RSS_MAX_SIZE) {
+                            size1Input = it // Shows change to user
+                            viewModel.configuration = byteArrayOf(1, it.toByte()) // Stores user input to ViewModel configuration. 1 = sorting by size
+                        } else {
+                            size1Input = RSS_MAX_SIZE.toString()
+                            viewModel.configuration = byteArrayOf(1, RSS_MAX_SIZE.toByte())
+                            showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = stringResource(id = R.string.size_size1_solo_box_info),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                Text(
+                    text = "Waiting for connection to RSS...",
+                    fontStyle = FontStyle.Italic
+                )
+            }
             Spacer(modifier = Modifier.height(32.dp))
             // Persistent column for current size
             Column(
