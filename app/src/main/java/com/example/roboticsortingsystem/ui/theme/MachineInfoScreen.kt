@@ -41,6 +41,34 @@ fun DiagnosticText(
     )
 }
 
+// Provides diagnostic text for size sorting that can be expanded to n cutoffs
+@Composable
+fun SizeSortInfo (
+    cutoffNumber: Int,
+    viewModel: RSSViewModel = hiltViewModel()
+) {
+    DiagnosticText(info = "Sorting type: Size")
+    DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[1]} cm")
+}
+
+// Provides diagnostic text for color sorting that can be expanded to n cutoffs
+@Composable
+fun ColorSortInfo (
+    binNumber: Int,
+    viewModel: RSSViewModel = hiltViewModel()
+) {
+    DiagnosticText(info = "Sorting type: Color")
+    when (viewModel.configuration[1].toInt()) { // Displays correct color based on encoding
+        1 -> { DiagnosticText(info = "Color for bin $binNumber: Red") }
+        2 -> { DiagnosticText(info = "Color for bin $binNumber: Orange") }
+        3 -> { DiagnosticText(info = "Color for bin $binNumber: Yellow") }
+        4 -> { DiagnosticText(info = "Color for bin $binNumber: Green") }
+        5 -> { DiagnosticText(info = "Color for bin $binNumber: Purple") }
+        6 -> { DiagnosticText(info = "Color for bin $binNumber: Brown") }
+        else -> { DiagnosticText(info = "Color for bin $binNumber: Unknown") }
+    }
+}
+
 // Draws the screen that shows diagnostic information from the RSS
 @OptIn(ExperimentalPermissionsApi::class)   // The Accompanist Jetpack Compose permissions library is still technically experimental,
                                             // but necessary for Composables to check permissions
@@ -120,9 +148,25 @@ fun MachineInfoScreen(
                 }
             }
             else if (bleConnectionState == ConnectionState.Connected) {
+                // Display weight
                 DiagnosticText(info = "Weight: ${viewModel.weight}")
-                DiagnosticText(info = "Configuration: ${viewModel.configuration}")
-                DiagnosticText(info = "Connection state: ${viewModel.connectionState}")
+                // Display sorting configuration
+                when (viewModel.configuration.first().toInt()) {
+                    1 -> { // Indicates size configuration
+                        SizeSortInfo(cutoffNumber = 1, viewModel)}
+                    2 -> { // Indicates color configuration
+                        ColorSortInfo(binNumber = 1, viewModel)
+                    }
+                    else -> DiagnosticText(info = "Sorting type: Unknown")
+                }
+                // Display connection state
+                when (viewModel.connectionState) {
+                    ConnectionState.Connected -> DiagnosticText(info = "Connection state: Connected")
+                    ConnectionState.Disconnected -> DiagnosticText(info = "Connection state: Disconnected")
+                    ConnectionState.Initializing -> DiagnosticText(info = "Connection state: Initializing")
+                    ConnectionState.Uninitialized -> DiagnosticText(info = "Connection state: Uninitialized")
+                    else -> DiagnosticText(info = "Connection state: Unknown")
+                }
             }
             else if (viewModel.errorMessage != null) {
                 DiagnosticText(info = viewModel.errorMessage!!)
