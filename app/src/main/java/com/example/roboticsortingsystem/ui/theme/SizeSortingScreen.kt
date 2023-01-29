@@ -1,18 +1,21 @@
 package com.example.roboticsortingsystem.ui.theme
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -33,6 +36,10 @@ import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import kotlinx.coroutines.launch
+
+// Specifies maximum size for sorting: anything above this will not be written to the ViewModel
+val RSS_MAX_SIZE = 100
 
 @Composable
 // Common framework for the two text boxes: simplifies code in SizeSortingScreen
@@ -70,6 +77,14 @@ fun sizeOut(raw: String): UInt {
     } else {
         raw.toUInt()
     }
+}
+
+// Shows toasts as necessary
+fun showToast(
+    context: Context,
+    toastText: String
+) {
+    Toast.makeText(context, toastText, LENGTH_SHORT).show()
 }
 
 // Shows the screen used to pass size configurations to the RSS
@@ -132,52 +147,70 @@ fun SizeSortingScreen (
 
     // UI logic
     var size1Input by rememberSaveable { mutableStateOf("") } // Passed to InputBox to display user text. rememberSaveable: text stays when device rotated
+    val context = LocalContext.current // Used to show toasts
     var currentSize = ""
     if (bleConnectionState == ConnectionState.Uninitialized) {
         currentSize = "Reading configuration value..."
     } else {
         currentSize = sizeIn(viewModel.configuration)
     }
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()), // Allows scrolling for smaller screens
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        // Size 1 input box
-        InputBox(
-            label = R.string.size_size1_box_label,
-            entry = size1Input,
-            onValueChange = {
-                size1Input = it // Shows change to user
-                viewModel.configuration = byteArrayOf(1, it.toByte()) }, // Stores user input to ViewModel configuration. 1 = sorting by size
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = stringResource(id = R.string.size_size1_solo_box_info),
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        // Persistent column for current size
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()), // Allows scrolling for smaller screens
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "Current size: $currentSize",
-                textAlign = TextAlign.Center,
-                fontSize = 18.sp,
-                fontStyle = FontStyle.Italic
+            // Size 1 input box
+            InputBox(
+                label = R.string.size_size1_box_label,
+                entry = size1Input,
+                onValueChange = {
+                    if (it == "") { // Prevents crash when clearing the input field (due to trying to set a null config value in the ViewModel)
+                        size1Input = "" // Shows an empty box
+                        viewModel.configuration = byteArrayOf(1, 1)
+                    }
+                    else if (it.toInt() < RSS_MAX_SIZE) {
+                        size1Input = it // Shows change to user
+                        viewModel.configuration = byteArrayOf(1, it.toByte()) // Stores user input to ViewModel configuration. 1 = sorting by size
+                    } else {
+                        size1Input = RSS_MAX_SIZE.toString()
+                        viewModel.configuration = byteArrayOf(1, RSS_MAX_SIZE.toByte())
+                        showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.size_size1_solo_box_info),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            // Persistent column for current size
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Current size: $currentSize",
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    fontStyle = FontStyle.Italic
+                )
+            }
+            ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
+            ConfigurationApplyButton(onClick = {
+                if (viewModel.configuration[1] in 1 until RSS_MAX_SIZE) { // Checks that value is inside acceptable bounds
+                    viewModel.writeToRSS() // Writes configuration in ViewModel to RSS
+                } else { // Don't write value and notify the user
+                    showToast(context, "Size value out of range")
+                }
+            })
         }
-        ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
-        ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Writes configuration in ViewModel to RSS
-    }
 }
 
 // Preview function used for debugging in Android Studio
