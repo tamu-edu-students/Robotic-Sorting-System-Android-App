@@ -68,17 +68,6 @@ fun sizeIn(raw: ByteArray) : String {
     }
 }
 
-// Converts from user input string to int that goes to the ViewModel
-// TODO: make this not break everything
-fun sizeOut(raw: String): UInt {
-    return if (raw.toInt() > 9) {
-        Log.e("sizeOut","Error: could not write input (out of range). Writing 0...")
-        0u // Returns 0 if the input is out of bounds, which can be handled as an error
-    } else {
-        raw.toUInt()
-    }
-}
-
 // Shows toasts as necessary
 fun showToast(
     context: Context,
