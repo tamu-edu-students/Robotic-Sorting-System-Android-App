@@ -20,5 +20,5 @@ interface DataReadInterface {
 
     fun closeConnection()
 
-    fun write(config: UInt) // Necessary to pass UInt to write from ViewModel
+    fun write(config: ByteArray) // Necessary to pass UInt to write from ViewModel
 }

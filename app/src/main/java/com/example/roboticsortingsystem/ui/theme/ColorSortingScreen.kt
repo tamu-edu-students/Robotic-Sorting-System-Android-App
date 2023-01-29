@@ -76,17 +76,16 @@ fun ColorButtons(
 }
 
 // Translates the raw value received from the RSS to the current color
-fun colorIn(raw: UInt) : String {
-    val rawInt = raw.toInt() // In Kotlin, != can't use a UInt
+fun colorIn(raw: ByteArray) : String {
     // If the first digit is 0, the machine is currently configured for size
-    if (rawInt % 100 != 0) {
-        when (rawInt % 10) { // The second digit corresponds to a color
-            0 -> { return "Red" }
-            1 -> { return "Orange"}
-            2 -> { return "Yellow"}
-            3 -> { return "Green"}
-            4 -> { return "Purple"}
-            5 -> { return "Brown"}
+    if (raw.first().toInt() == 2) {
+        when (raw[1].toInt()) { // The second digit corresponds to a color
+            1 -> { return "Red" }
+            2 -> { return "Orange"}
+            3 -> { return "Yellow"}
+            4 -> { return "Green"}
+            5 -> { return "Purple"}
+            6 -> { return "Brown"}
             else -> { return "Unknown"}
         }
     } else {
@@ -178,13 +177,13 @@ fun ColorSortingScreen(
         )
         Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
         ColorButtons(onSelectionChanged = {
-            when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel
-                "Red" -> { viewModel.configuration = 10u }
-                "Orange" -> { viewModel.configuration = 11u }
-                "Yellow" -> { viewModel.configuration = 12u }
-                "Green" -> { viewModel.configuration = 13u }
-                "Purple" -> { viewModel.configuration = 14u }
-                "Brown" -> { viewModel.configuration = 15u }
+            when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
+                "Red" -> { viewModel.configuration = byteArrayOf(2, 1) }
+                "Orange" -> { viewModel.configuration = byteArrayOf(2, 2) }
+                "Yellow" -> { viewModel.configuration = byteArrayOf(2, 3) }
+                "Green" -> { viewModel.configuration = byteArrayOf(2, 4) }
+                "Purple" -> { viewModel.configuration = byteArrayOf(2, 5) }
+                "Brown" -> { viewModel.configuration = byteArrayOf(2, 6) }
                 else -> {} // Don't change anything if the returned color isn't valid
             }
         })

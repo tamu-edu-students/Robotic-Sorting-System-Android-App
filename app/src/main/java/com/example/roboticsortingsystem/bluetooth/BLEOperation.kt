@@ -21,5 +21,5 @@ data class characteristicWrite (
     override val gatt: BluetoothGatt,
     val serviceUUID: UUID,
     val characteristicUUID: UUID,
-    val writeValue: UInt
+    val writeValue: ByteArray
         ) : BLEOperation()

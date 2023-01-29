@@ -52,10 +52,9 @@ fun InputBox(
 }
 
 // Converts raw numbers from ViewModel to an easily displayed string
-fun sizeIn(raw: UInt) : String {
-    val rawInt = raw.toInt()
-    return if (rawInt % 100 != 1) { // If the first digit is 1, the machine is currently configured for color
-        "$rawInt cm."
+fun sizeIn(raw: ByteArray) : String {
+    return if (raw.first().toInt() == 1) { // If the first byte is 1, the machine is currently configured for color
+        "${raw[1]} cm." // Second byte is the sort value
     }
     else {
         "Currently configured for color"
@@ -153,7 +152,7 @@ fun SizeSortingScreen (
             entry = size1Input,
             onValueChange = {
                 size1Input = it // Shows change to user
-                viewModel.configuration = it.toUInt() }, // Stores user input to ViewModel configuration
+                viewModel.configuration = byteArrayOf(1, it.toByte()) }, // Stores user input to ViewModel configuration. 1 = sorting by size
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
         )
         Spacer(modifier = Modifier.height(16.dp))

@@ -107,7 +107,7 @@ class DataReadWriteManager @Inject constructor(
     @SuppressLint("MissingPermission")
     fun rssWrite(
         gatt: BluetoothGatt,
-        configFromViewModel: UInt
+        configFromViewModel: ByteArray
     ) {
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
@@ -193,7 +193,7 @@ class DataReadWriteManager @Inject constructor(
                             }
 
                         } else {
-                            val rssConfig = value.first().toUInt()
+                            val rssConfig = value // Writes whole ByteArray to ViewModel
                             val configCapsule = ConfigurationPackage(rssConfig)
                             coroutineScope.launch {
                                 configRead.emit(Resource.Success(configCapsule))
@@ -267,7 +267,7 @@ class DataReadWriteManager @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    override fun write(config: UInt) {
+    override fun write(config: ByteArray) {
         gatt?.let { rssWrite(it, config) } // Check if gatt is null before passing it as a parameter
     }
 
@@ -316,10 +316,6 @@ class DataReadWriteManager @Inject constructor(
                 // Call to endOfOperation() is at end of onCharacteristicRead() callback
             }
             is characteristicWrite -> with (operation) {
-                val payloadValue = writeValue.toByte()
-                val payload = byteArrayOf(payloadValue) // BLE uses byteArrays: this puts the value in the first position
-
-                payload[0] = payloadValue
                 val characteristicToWrite = gatt.getService(serviceUUID)?.getCharacteristic(characteristicUUID)
                 if (characteristicToWrite != null) {
                     val writeType = when { // Set write type based on whether the characteristic is writable w/ a response or not
@@ -327,10 +323,10 @@ class DataReadWriteManager @Inject constructor(
                         characteristicToWrite.isWritableWithoutResponse() -> BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                         else -> { Log.e("nextOperation", "Cannot write to $characteristicUUID") }
                     }
-                    // Convert write value to byteArray to write
+                    // Set write type
                     characteristicToWrite.writeType = writeType
                     // Perform the write
-                    characteristicToWrite.value = payload
+                    characteristicToWrite.value = writeValue // Writes ByteArray to RSS
                     gatt.writeCharacteristic(characteristicToWrite)
                 } else {
                     Log.e("nextOperation", "Did not find characteristic with UUID $characteristicUUID to write")
