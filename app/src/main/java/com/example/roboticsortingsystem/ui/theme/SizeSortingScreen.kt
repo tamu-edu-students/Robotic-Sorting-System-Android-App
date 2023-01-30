@@ -34,6 +34,7 @@ import com.example.roboticsortingsystem.bluetooth.PermissionState
 import com.example.roboticsortingsystem.bluetooth.SystemBroadcastReceiver
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
+import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
@@ -261,21 +262,8 @@ fun SizeSortingScreen (
                 }
             })
         }
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Connecting to Robotic Sorting System...",
-                fontStyle = FontStyle.Italic
-            )
-        }
+    } else { // Shows a loading screen that prevents the user from interacting with the configuration before connection
+        RSSLoadingScreen()
     }
 }
 

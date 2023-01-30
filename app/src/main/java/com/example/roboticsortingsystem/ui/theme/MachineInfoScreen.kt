@@ -27,6 +27,7 @@ import com.example.roboticsortingsystem.RSSViewModel
 import com.example.roboticsortingsystem.bluetooth.ConnectionState
 import com.example.roboticsortingsystem.bluetooth.PermissionState
 import com.example.roboticsortingsystem.bluetooth.SystemBroadcastReceiver
+import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
@@ -125,53 +126,57 @@ fun MachineInfoScreen(
         }
     }
 
-    // This is a placeholder: actual info will go here during integration in 404
+
     // Nested columns ensure that arrangement works correctly
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    if (bleConnectionState == ConnectionState.Connected) {
         Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .border(width = 1.dp, color = Color.Green) // Basic theming to identify this as diagnostic info: will make more visually appealing later
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // TODO: change to a fixed-width font in DiagnosticTest function
-            if (bleConnectionState == ConnectionState.Uninitialized) {
-                DiagnosticText(info = "Uninitialized")
-            }
-            else if (bleConnectionState == ConnectionState.Initializing) {
-                if (viewModel.initializingMessage != null) {
-                    Text(
-                        text = viewModel.initializingMessage!!
-                    )
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .border(width = 1.dp, color = Color.Green) // Basic theming to identify this as diagnostic info: will make more visually appealing later
+            ) {
+                // TODO: change to a fixed-width font in DiagnosticTest function
+                if (bleConnectionState == ConnectionState.Uninitialized) {
+                    DiagnosticText(info = "Uninitialized")
                 }
-            }
-            else if (bleConnectionState == ConnectionState.Connected) {
-                // Display weight
-                DiagnosticText(info = "Weight: ${viewModel.weight}")
-                // Display sorting configuration
-                when (viewModel.configuration.first().toInt()) {
-                    1 -> { // Indicates size configuration
-                        SizeSortInfo(cutoffNumber = 1, viewModel)}
-                    2 -> { // Indicates color configuration
-                        ColorSortInfo(binNumber = 1, viewModel)
+                else if (bleConnectionState == ConnectionState.Initializing) {
+                    if (viewModel.initializingMessage != null) {
+                        Text(
+                            text = viewModel.initializingMessage!!
+                        )
                     }
-                    else -> DiagnosticText(info = "Sorting type: Unknown")
                 }
-                // Display connection state
-                when (viewModel.connectionState) {
-                    ConnectionState.Connected -> DiagnosticText(info = "Connection state: Connected")
-                    ConnectionState.Disconnected -> DiagnosticText(info = "Connection state: Disconnected")
-                    ConnectionState.Initializing -> DiagnosticText(info = "Connection state: Initializing")
-                    ConnectionState.Uninitialized -> DiagnosticText(info = "Connection state: Uninitialized")
-                    else -> DiagnosticText(info = "Connection state: Unknown")
+                else if (bleConnectionState == ConnectionState.Connected) {
+                    // Display weight
+                    DiagnosticText(info = "Weight: ${viewModel.weight}")
+                    // Display sorting configuration
+                    when (viewModel.configuration.first().toInt()) {
+                        1 -> { // Indicates size configuration
+                            SizeSortInfo(cutoffNumber = 1, viewModel)}
+                        2 -> { // Indicates color configuration
+                            ColorSortInfo(binNumber = 1, viewModel)
+                        }
+                        else -> DiagnosticText(info = "Sorting type: Unknown")
+                    }
+                    // Display connection state
+                    when (viewModel.connectionState) {
+                        ConnectionState.Connected -> DiagnosticText(info = "Connection state: Connected")
+                        ConnectionState.Disconnected -> DiagnosticText(info = "Connection state: Disconnected")
+                        ConnectionState.Initializing -> DiagnosticText(info = "Connection state: Initializing")
+                        ConnectionState.Uninitialized -> DiagnosticText(info = "Connection state: Uninitialized")
+                        else -> DiagnosticText(info = "Connection state: Unknown")
+                    }
                 }
-            }
-            else if (viewModel.errorMessage != null) {
-                DiagnosticText(info = viewModel.errorMessage!!)
+                else if (viewModel.errorMessage != null) {
+                    DiagnosticText(info = viewModel.errorMessage!!)
+                }
             }
         }
+    } else {
+        RSSLoadingScreen()
     }
 }
 

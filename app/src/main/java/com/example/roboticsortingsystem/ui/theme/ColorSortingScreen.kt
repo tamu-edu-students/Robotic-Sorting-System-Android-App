@@ -29,6 +29,7 @@ import com.example.roboticsortingsystem.bluetooth.PermissionState
 import com.example.roboticsortingsystem.bluetooth.SystemBroadcastReceiver
 import com.example.roboticsortingsystem.components.ConfigurationApplyButton
 import com.example.roboticsortingsystem.components.ConfigurationCancelButton
+import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
@@ -78,16 +79,29 @@ fun ColorButtons(
 // Translates the raw value received from the RSS to the current color
 fun colorIn(raw: ByteArray) : String {
     // If the first digit is 0, the machine is currently configured for size
+    var color1 = ""
+    var color2 = ""
     if (raw.first().toInt() == 2) {
-        when (raw[1].toInt()) { // The second digit corresponds to a color
-            1 -> { return "Red" }
-            2 -> { return "Orange"}
-            3 -> { return "Yellow"}
-            4 -> { return "Green"}
-            5 -> { return "Purple"}
-            6 -> { return "Brown"}
-            else -> { return "Unknown"}
+        color1 = when (raw[1].toInt()) { // The second digit corresponds to the first cutoff
+            1 -> { "Red" }
+            2 -> { "Orange"}
+            3 -> { "Yellow"}
+            4 -> { "Green"}
+            5 -> { "Purple"}
+            6 -> { "Brown"}
+            else -> { "Unknown"}
         }
+        color2 = when (raw[2].toInt()) {
+            0 -> { "None" } // Only the second cutoff can have a 0/none value
+            1 -> { "Red" }
+            2 -> { "Orange"}
+            3 -> { "Yellow"}
+            4 -> { "Green"}
+            5 -> { "Purple"}
+            6 -> { "Brown"}
+            else -> { "Unknown"}
+        }
+        return "Color 1: $color1, Color 2: $color2"
     } else {
         return "Currently configured for size"
     }
@@ -160,51 +174,55 @@ fun ColorSortingScreen(
         currentColor = colorIn(viewModel.configuration)
     }
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()), // Allows vertical scrolling of column
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-
-        // Color 1 selection
-        Text(
-            text = stringResource(id = R.string.color_color1),
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp
-        )
-        Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
-        ColorButtons(onSelectionChanged = {
-            when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
-                "Red" -> { viewModel.configuration = byteArrayOf(2, 1) }
-                "Orange" -> { viewModel.configuration = byteArrayOf(2, 2) }
-                "Yellow" -> { viewModel.configuration = byteArrayOf(2, 3) }
-                "Green" -> { viewModel.configuration = byteArrayOf(2, 4) }
-                "Purple" -> { viewModel.configuration = byteArrayOf(2, 5) }
-                "Brown" -> { viewModel.configuration = byteArrayOf(2, 6) }
-                else -> {} // Don't change anything if the returned color isn't valid
-            }
-        })
-        // Can add Color 2 here if necessary
-
-        // Persistent column for current color
+    if (bleConnectionState == ConnectionState.Connected) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()), // Allows vertical scrolling of column
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
+
+            // Color 1 selection
             Text(
-                text = "Current color: $currentColor",
+                text = stringResource(id = R.string.color_color1),
                 textAlign = TextAlign.Center,
-                fontSize = 18.sp,
-                fontStyle = FontStyle.Italic
+                fontSize = 18.sp
             )
+            Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
+            ColorButtons(onSelectionChanged = {
+                when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
+                    "Red" -> { viewModel.configuration = byteArrayOf(2, 1) }
+                    "Orange" -> { viewModel.configuration = byteArrayOf(2, 2) }
+                    "Yellow" -> { viewModel.configuration = byteArrayOf(2, 3) }
+                    "Green" -> { viewModel.configuration = byteArrayOf(2, 4) }
+                    "Purple" -> { viewModel.configuration = byteArrayOf(2, 5) }
+                    "Brown" -> { viewModel.configuration = byteArrayOf(2, 6) }
+                    else -> {} // Don't change anything if the returned color isn't valid
+                }
+            })
+            // Can add Color 2 here if necessary
+
+            // Persistent column for current color
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Current color: $currentColor",
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    fontStyle = FontStyle.Italic
+                )
+            }
+            ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
+            ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Tells the ViewModel to write to the RSS
         }
-        ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
-        ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Tells the ViewModel to write to the RSS
+    } else {
+        RSSLoadingScreen()
     }
 }
 
