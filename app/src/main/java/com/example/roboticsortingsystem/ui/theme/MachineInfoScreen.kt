@@ -48,8 +48,7 @@ fun SizeSortInfo (
     cutoffNumber: Int,
     viewModel: RSSViewModel = hiltViewModel()
 ) {
-    DiagnosticText(info = "Sorting type: Size")
-    DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[1]} cm")
+    DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[cutoffNumber]} cm")
 }
 
 // Provides diagnostic text for color sorting that can be expanded to n cutoffs
@@ -58,8 +57,7 @@ fun ColorSortInfo (
     binNumber: Int,
     viewModel: RSSViewModel = hiltViewModel()
 ) {
-    DiagnosticText(info = "Sorting type: Color")
-    when (viewModel.configuration[1].toInt()) { // Displays correct color based on encoding
+    when (viewModel.configuration[binNumber].toInt()) { // Displays correct color based on encoding
         1 -> { DiagnosticText(info = "Color for bin $binNumber: Red") }
         2 -> { DiagnosticText(info = "Color for bin $binNumber: Orange") }
         3 -> { DiagnosticText(info = "Color for bin $binNumber: Yellow") }
@@ -155,9 +153,14 @@ fun MachineInfoScreen(
                     // Display sorting configuration
                     when (viewModel.configuration.first().toInt()) {
                         1 -> { // Indicates size configuration
-                            SizeSortInfo(cutoffNumber = 1, viewModel)}
+                            DiagnosticText(info = "Sorting type: Size")
+                            SizeSortInfo(cutoffNumber = 1, viewModel)
+                            SizeSortInfo(cutoffNumber = 2, viewModel)
+                        }
                         2 -> { // Indicates color configuration
+                            DiagnosticText(info = "Sorting type: Color")
                             ColorSortInfo(binNumber = 1, viewModel)
+                            ColorSortInfo(binNumber = 2, viewModel)
                         }
                         else -> DiagnosticText(info = "Sorting type: Unknown")
                     }

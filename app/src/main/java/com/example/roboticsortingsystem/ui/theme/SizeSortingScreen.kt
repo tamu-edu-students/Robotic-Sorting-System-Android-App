@@ -180,6 +180,7 @@ fun SizeSortingScreen (
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
+                // TODO: why does hitting the enter button on this cause a crash? Maybe have it just go to the next box/send config...
             )
 
 
