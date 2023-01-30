@@ -39,7 +39,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
 
 // Specifies maximum size for sorting: anything above this will not be written to the ViewModel
-val RSS_MAX_SIZE = 100
+const val RSS_MAX_SIZE = 100
 
 @Composable
 // Common framework for the two text boxes: simplifies code in SizeSortingScreen
@@ -61,7 +61,7 @@ fun InputBox(
 // Converts raw numbers from ViewModel to an easily displayed string
 fun sizeIn(raw: ByteArray) : String {
     return if (raw.first().toInt() == 1) { // If the first byte is 1, the machine is currently configured for color
-        "${raw[1]} cm." // Second byte is the sort value
+        "Cutoff 1: ${raw[1]} cm, Cutoff 2: ${raw[2]} cm" // Second byte is the sort value
     }
     else {
         "Currently configured for color"
@@ -89,13 +89,15 @@ fun SizeSortingScreen (
     // SystemBroadcastReceiver listens for state changes from the BluetoothAdapter (e.g. user turns off Bluetooth)
     // and launches a re-activation prompt from the passed-in onBluetoothStateChanged function
     SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED) { bluetoothState ->
-        val action = bluetoothState?.action ?: return@SystemBroadcastReceiver // return if bluetoothState does not exist
+        val action = bluetoothState?.action
+            ?: return@SystemBroadcastReceiver // return if bluetoothState does not exist
         if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
             onBluetoothStateChanged()
         }
     }
 
-    val permissionState = rememberMultiplePermissionsState(permissions = PermissionState.permissions)
+    val permissionState =
+        rememberMultiplePermissionsState(permissions = PermissionState.permissions)
     val lifecycleOwner = LocalLifecycleOwner.current
     val bleConnectionState = viewModel.connectionState
 
@@ -103,19 +105,20 @@ fun SizeSortingScreen (
     DisposableEffect(
         key1 = lifecycleOwner,
         effect = {
-            val observer = LifecycleEventObserver {_, event -> // Observes lifecycle state for use by this DisposableEffect
-                if(event == Lifecycle.Event.ON_START){
-                    permissionState.launchMultiplePermissionRequest() // Launches request for relevant permissions on start
-                    if(permissionState.allPermissionsGranted && bleConnectionState == ConnectionState.Disconnected){ // Can simply reconnect if all permissions have already been given
-                        viewModel.reconnect()
+            val observer =
+                LifecycleEventObserver { _, event -> // Observes lifecycle state for use by this DisposableEffect
+                    if (event == Lifecycle.Event.ON_START) {
+                        permissionState.launchMultiplePermissionRequest() // Launches request for relevant permissions on start
+                        if (permissionState.allPermissionsGranted && bleConnectionState == ConnectionState.Disconnected) { // Can simply reconnect if all permissions have already been given
+                            viewModel.reconnect()
+                        }
+                    }
+                    if (event == Lifecycle.Event.ON_STOP) { // UI prompts viewModel to terminate Bluetooth connection at end of lifecycle
+                        if (bleConnectionState == ConnectionState.Connected) {
+                            viewModel.disconnect()
+                        }
                     }
                 }
-                if(event == Lifecycle.Event.ON_STOP){ // UI prompts viewModel to terminate Bluetooth connection at end of lifecycle
-                    if (bleConnectionState == ConnectionState.Connected){
-                        viewModel.disconnect()
-                    }
-                }
-            }
             lifecycleOwner.lifecycle.addObserver(observer)
 
             onDispose { // Gets rid of observer on close to free up system resources
@@ -127,7 +130,7 @@ fun SizeSortingScreen (
     // LaunchedEffect launches when all permissions are granted: specifically, starts connection if all permissions are granted and the connection is not already established
     LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
         if (permissionState.allPermissionsGranted) {
-            if (bleConnectionState  == ConnectionState.Uninitialized) {
+            if (bleConnectionState == ConnectionState.Uninitialized) {
                 viewModel.initializeConnection()
             }
         }
@@ -136,6 +139,7 @@ fun SizeSortingScreen (
 
     // UI logic
     var size1Input by rememberSaveable { mutableStateOf("") } // Passed to InputBox to display user text. rememberSaveable: text stays when device rotated
+    var size2Input by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current // Used to show toasts
     var currentSize = ""
     if (bleConnectionState == ConnectionState.Uninitialized) {
@@ -143,6 +147,7 @@ fun SizeSortingScreen (
     } else {
         currentSize = sizeIn(viewModel.configuration)
     }
+    if (bleConnectionState == ConnectionState.Connected) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -152,38 +157,83 @@ fun SizeSortingScreen (
             verticalArrangement = Arrangement.Top
         ) {
             // Size 1 input box
-            // Only show if connected to RSS
-            if (bleConnectionState == ConnectionState.Connected) {
-                InputBox(
-                    label = R.string.size_size1_box_label,
-                    entry = size1Input,
-                    onValueChange = {
-                        if (it == "") { // Prevents crash when clearing the input field (due to trying to set a null config value in the ViewModel)
-                            size1Input = "" // Shows an empty box
-                            viewModel.configuration = byteArrayOf(1, 1)
-                        }
-                        else if (it.toInt() < RSS_MAX_SIZE) {
-                            size1Input = it // Shows change to user
-                            viewModel.configuration = byteArrayOf(1, it.toByte()) // Stores user input to ViewModel configuration. 1 = sorting by size
-                        } else {
-                            size1Input = RSS_MAX_SIZE.toString()
-                            viewModel.configuration = byteArrayOf(1, RSS_MAX_SIZE.toByte())
-                            showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(id = R.string.size_size1_solo_box_info),
-                    textAlign = TextAlign.Center
-                )
-            } else {
-                Text(
-                    text = "Waiting for connection to RSS...",
-                    fontStyle = FontStyle.Italic
-                )
-            }
+            InputBox(
+                label = R.string.size_size1_box_label,
+                entry = size1Input,
+                onValueChange = {
+                    if (it == "") { // Prevents crash when clearing the input field (due to trying to set a null config value in the ViewModel)
+                        size1Input = "" // Shows an empty box
+                        viewModel.configuration[0] = 1
+                        viewModel.configuration[1] = 1
+                        viewModel.configuration[2] =
+                            viewModel.configuration[2] // Necessary to keep the value of the second cutoff when just the first is changed
+                    } else if (it.toInt() in 1 until RSS_MAX_SIZE) {
+                        size1Input = it // Shows change to user
+                        viewModel.configuration = byteArrayOf(
+                            1,
+                            it.toByte(),
+                            viewModel.configuration[2]
+                        ) // Stores user input to ViewModel configuration. 1 = sorting by size
+                    } else {
+                        size1Input = RSS_MAX_SIZE.toString()
+                        viewModel.configuration[0] = 1 // Only change relevant bytes in the array
+                        viewModel.configuration[1] =
+                            RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                        showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
+            )
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.size_size1_solo_box_info),
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            // Size 2 input box
+            InputBox(
+                label = R.string.size_size2_box_label,
+                entry = size2Input,
+                onValueChange = {
+                    if (it == "") {
+                        size2Input = ""
+                        viewModel.configuration[0] = 1
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] =
+                            1 // Index 2 corresponds to place in array for 2nd cutoff
+                    } else if (it.toInt() in 0 until RSS_MAX_SIZE) { // 2nd value accepts 0
+                        size2Input = it // Shows change to user
+                        viewModel.configuration = byteArrayOf(
+                            1,
+                            viewModel.configuration[1],
+                            it.toByte()
+                        ) // Stores user input to ViewModel configuration. 1 = sorting by size
+                    } else {
+                        size2Input = RSS_MAX_SIZE.toString()
+                        viewModel.configuration[0] = 1
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] =
+                            RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
+                        showToast(context, "Size cutoff must be between 0 and $RSS_MAX_SIZE.")
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = (stringResource(id = R.string.size_size2_default_info)),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = (stringResource(id = R.string.size_size2_box_info)),
+                textAlign = TextAlign.Center
+            )
             Spacer(modifier = Modifier.height(32.dp))
             // Persistent column for current size
             Column(
@@ -201,14 +251,34 @@ fun SizeSortingScreen (
             }
             ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
             ConfigurationApplyButton(onClick = {
-                if (viewModel.configuration[1] in 1 until RSS_MAX_SIZE) { // Checks that value is inside acceptable bounds
+                if (((viewModel.configuration[2].toInt()) != 0) && (viewModel.configuration[2] <= viewModel.configuration[1])) {
+                    showToast(context, "Sorting cutoff 1 must be less than sorting cutoff 2.")
+                } else if (viewModel.configuration[1] in 1 until RSS_MAX_SIZE) { // Checks that value is inside acceptable bounds
                     viewModel.writeToRSS() // Writes configuration in ViewModel to RSS
+                    showToast(context, "Size sorting configuration written to system.")
                 } else { // Don't write value and notify the user
-                    showToast(context, "Size value out of range")
+                    showToast(context, "One or more sorting cutoffs are out of range.")
                 }
             })
         }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Connecting to Robotic Sorting System...",
+                fontStyle = FontStyle.Italic
+            )
+        }
+    }
 }
+
 
 // Preview function used for debugging in Android Studio
 @Preview
