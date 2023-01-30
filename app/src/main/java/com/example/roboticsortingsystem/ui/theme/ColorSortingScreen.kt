@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -33,12 +34,16 @@ import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
+// Note: showToast function is defined in SizeSortingScreen.kt
+
 // Creates column of radio buttons for color choice (should be called from inside a column)
 @Composable
 fun ColorButtons(
     modifier: Modifier = Modifier,
+    allowsNone: Boolean,
     onSelectionChanged: (String) -> Unit = {} // Notifies caller that a selection was made/changed
 ) {
+
     // List stores all possible color choices
     val colorChoices = listOf(
         stringResource(id = R.string.color_red),
@@ -46,32 +51,66 @@ fun ColorButtons(
         stringResource(id = R.string.color_yellow),
         stringResource(id = R.string.color_green),
         stringResource(id = R.string.color_purple),
-        stringResource(id = R.string.color_brown),
+        stringResource(id = R.string.color_brown)
+    )
+
+    // Use list with "none" option if allowsNone = true
+    val colorChoicesWithNone = listOf(
+        stringResource(id = R.string.color_none),
+        stringResource(id = R.string.color_red),
+        stringResource(id = R.string.color_orange),
+        stringResource(id = R.string.color_yellow),
+        stringResource(id = R.string.color_green),
+        stringResource(id = R.string.color_purple),
+        stringResource(id = R.string.color_brown)
     )
 
     // Stores value selected by user and preserves it across rebuilds
-    var selectedButton by rememberSaveable { mutableStateOf("")}
+    var selectedButton by rememberSaveable { mutableStateOf("") }
 
     // Creates a row for each color
     // Adapted from Google Android Basics with Compose "Cupcake" example application
-    colorChoices.forEach { item ->
-        Row(
-            modifier = Modifier.selectable(
-                selected = selectedButton == item,
-                onClick = {
-                    selectedButton = item
-                    onSelectionChanged(item)
-                }
-            ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RadioButton(
-                selected = selectedButton == item,
-                onClick = {
-                    selectedButton = item
-                    onSelectionChanged(item)
-                })
-            Text(item)
+    if (allowsNone) {
+        colorChoicesWithNone.forEach { item ->
+            Row(
+                modifier = Modifier.selectable(
+                    selected = selectedButton == item,
+                    onClick = {
+                        selectedButton = item
+                        onSelectionChanged(item)
+                    }
+                ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = selectedButton == item,
+                    onClick = {
+                        selectedButton = item
+                        onSelectionChanged(item)
+                    })
+                Text(item)
+            }
+        }
+    } else {
+        colorChoices.forEach { item ->
+            Row(
+                modifier = Modifier.selectable(
+                    selected = selectedButton == item,
+                    onClick = {
+                        selectedButton = item
+                        onSelectionChanged(item)
+                    }
+                ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = selectedButton == item,
+                    onClick = {
+                        selectedButton = item
+                        onSelectionChanged(item)
+                    })
+                Text(item)
+            }
         }
     }
 }
@@ -166,7 +205,9 @@ fun ColorSortingScreen(
 
 
     // UI
-    var color1Input by remember { mutableStateOf("") } // Stores user's chosen colors
+    var color1Input by rememberSaveable { mutableStateOf("") } // Stores user's chosen colors
+    var color2Input by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current // Used to show toasts
     var currentColor = ""
     if (bleConnectionState == ConnectionState.Uninitialized) {
         currentColor = "Reading configuration value..."
@@ -191,18 +232,97 @@ fun ColorSortingScreen(
                 fontSize = 18.sp
             )
             Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
-            ColorButtons(onSelectionChanged = {
-                when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
-                    "Red" -> { viewModel.configuration = byteArrayOf(2, 1) }
-                    "Orange" -> { viewModel.configuration = byteArrayOf(2, 2) }
-                    "Yellow" -> { viewModel.configuration = byteArrayOf(2, 3) }
-                    "Green" -> { viewModel.configuration = byteArrayOf(2, 4) }
-                    "Purple" -> { viewModel.configuration = byteArrayOf(2, 5) }
-                    "Brown" -> { viewModel.configuration = byteArrayOf(2, 6) }
+            ColorButtons(
+                allowsNone = false, // "None" option only allowed on 2nd color
+                onSelectionChanged = {
+                    color1Input = it
+                    when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
+                    "Red" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 1
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    "Orange" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 2
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    "Yellow" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 3
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    "Green" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 4
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    "Purple" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 5
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    "Brown" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = 6
+                        viewModel.configuration[2] = viewModel.configuration[2]
+                    }
+                    else -> {} // Don't change anything if the returned color isn't valid
+                }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            // Color 2 selection
+            Text(
+                text = stringResource(id = R.string.color_color2),
+                textAlign = TextAlign.Center,
+                fontSize = 18.sp
+            )
+            Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
+            ColorButtons(
+                allowsNone = true,
+                onSelectionChanged = {
+                    color2Input = it
+                    when(it) { // Takes the number corresponding to the button the user selected and writes it to the ViewModel (with leading 2 for color configuration)
+                    "None (for 2-bin sorting)" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 0
+                    }
+                    "Red" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 1
+                    }
+                    "Orange" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 2
+                    }
+                    "Yellow" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 3
+                    }
+                    "Green" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 4
+                    }
+                    "Purple" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 5
+                    }
+                    "Brown" -> {
+                        viewModel.configuration[0] = 2
+                        viewModel.configuration[1] = viewModel.configuration[1]
+                        viewModel.configuration[2] = 6
+                    }
                     else -> {} // Don't change anything if the returned color isn't valid
                 }
             })
-            // Can add Color 2 here if necessary
 
             // Persistent column for current color
             Column(
@@ -212,14 +332,22 @@ fun ColorSortingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Current color: $currentColor",
+                    text = "Configuration currently on RSS: $currentColor", // Doesn't show live updates because of the way radio buttons work in Kotlin
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
                     fontStyle = FontStyle.Italic
                 )
             }
             ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
-            ConfigurationApplyButton(onClick = { viewModel.writeToRSS() }) // Tells the ViewModel to write to the RSS
+            ConfigurationApplyButton(onClick = {
+                if (viewModel.configuration[1] == viewModel.configuration[2]) { // The colors can't be the same
+                    showToast(context, "The sorting colors cannot be the same. Please choose again."
+                    )
+                } else {
+                    viewModel.writeToRSS() // Tells the ViewModel to write to the RSS
+                    showToast(context, "Color sorting configuration written to system.")
+                }
+            })
         }
     } else {
         RSSLoadingScreen()

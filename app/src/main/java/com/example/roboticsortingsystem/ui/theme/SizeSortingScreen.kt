@@ -69,7 +69,7 @@ fun sizeIn(raw: ByteArray) : String {
     }
 }
 
-// Shows toasts as necessary
+// Shows toasts (small popup messages) as necessary
 fun showToast(
     context: Context,
     toastText: String
@@ -166,20 +166,15 @@ fun SizeSortingScreen (
                         size1Input = "" // Shows an empty box
                         viewModel.configuration[0] = 1
                         viewModel.configuration[1] = 1
-                        viewModel.configuration[2] =
-                            viewModel.configuration[2] // Necessary to keep the value of the second cutoff when just the first is changed
+                        viewModel.configuration[2] = viewModel.configuration[2] // Necessary to keep the value of the second cutoff when just the first is changed
                     } else if (it.toInt() in 1 until RSS_MAX_SIZE) {
                         size1Input = it // Shows change to user
-                        viewModel.configuration = byteArrayOf(
-                            1,
-                            it.toByte(),
-                            viewModel.configuration[2]
+                        viewModel.configuration = byteArrayOf(1, it.toByte(), viewModel.configuration[2]
                         ) // Stores user input to ViewModel configuration. 1 = sorting by size
                     } else {
                         size1Input = RSS_MAX_SIZE.toString()
                         viewModel.configuration[0] = 1 // Only change relevant bytes in the array
-                        viewModel.configuration[1] =
-                            RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
+                        viewModel.configuration[1] = RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
                         viewModel.configuration[2] = viewModel.configuration[2]
                         showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
                     }
@@ -253,12 +248,12 @@ fun SizeSortingScreen (
             ConfigurationCancelButton(onClick = { onCancelButtonClicked() })
             ConfigurationApplyButton(onClick = {
                 if (((viewModel.configuration[2].toInt()) != 0) && (viewModel.configuration[2] <= viewModel.configuration[1])) {
-                    showToast(context, "Sorting cutoff 1 must be less than sorting cutoff 2.")
+                    showToast(context, "Sorting cutoff 1 must be less than sorting cutoff 2. Please choose again.")
                 } else if (viewModel.configuration[1] in 1 until RSS_MAX_SIZE) { // Checks that value is inside acceptable bounds
                     viewModel.writeToRSS() // Writes configuration in ViewModel to RSS
                     showToast(context, "Size sorting configuration written to system.")
                 } else { // Don't write value and notify the user
-                    showToast(context, "One or more sorting cutoffs are out of range.")
+                    showToast(context, "One or more sorting cutoffs are out of range. Please choose again.")
                 }
             })
         }
