@@ -24,7 +24,8 @@ enum class RSSScreen(@StringRes val title: Int) {
     MachineInfo(title = R.string.machine_info_screen),
     Configuration(title = R.string.configuration_screen),
     SizeSorting(title = R.string.size_screen),
-    ColorSorting(title = R.string.color_screen)
+    ColorSorting(title = R.string.color_screen),
+    BeltControl(title = R.string.belt_screen)
 }
 
 // Displays top bar and allows backward navigation where possible
@@ -79,7 +80,8 @@ fun RSSApp( // Controls navigation between screens
                 InitialScreen(
                     onSupportButtonClicked = {navController.navigate(RSSScreen.Support.name)}, // Calls the NavController to move to the support screen
                     onMachineInfoButtonClicked = {navController.navigate(RSSScreen.MachineInfo.name)},
-                    onConfigurationButtonClicked = {navController.navigate(RSSScreen.Configuration.name)}
+                    onConfigurationButtonClicked = {navController.navigate(RSSScreen.Configuration.name)},
+                    onBeltButtonClicked = {navController.navigate(RSSScreen.BeltControl.name)}
                 )
             }
             composable(route = RSSScreen.Support.name) {
@@ -105,6 +107,9 @@ fun RSSApp( // Controls navigation between screens
                     onCancelButtonClicked = { returnToStart(navController) },
                     onBluetoothStateChanged = onBluetoothStateChanged
                 )
+            }
+            composable(route = RSSScreen.BeltControl.name) {
+                BeltControlScreen(onBluetoothStateChanged = onBluetoothStateChanged)
             }
         }
     }

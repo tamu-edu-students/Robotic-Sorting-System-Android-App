@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Robotic Sorting System</string>
+    <string name="belt_screen">Start/Stop Conveyor Belt</string>
+    <string name="belt_start">Start Belt</string>
+    <string name="belt_stop">Stop Belt</string>
     <string name="initial_screen">Welcome to the Robotic Sorting System</string>
     <string name="support_screen">Support and Project Information</string>
     <string name="support_button">Support and Project Information</string>

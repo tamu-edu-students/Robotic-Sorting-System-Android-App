@@ -15,6 +15,7 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
     onSupportButtonClicked: () -> Unit = {}, // Handles navigation to the support screen when requested
     onMachineInfoButtonClicked: () -> Unit = {}, // Same for machine info screen
     onConfigurationButtonClicked: () -> Unit = {},
+    onBeltButtonClicked: () -> Unit = {}
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
         modifier = modifier
@@ -23,6 +24,8 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        ScreenSelectButton(labelResourceId = R.string.belt_screen, onClick = { onBeltButtonClicked() })
+        Spacer(modifier = Modifier.height(16.dp))
         ScreenSelectButton(labelResourceId = R.string.configuration_button, onClick = { onConfigurationButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
         ScreenSelectButton(labelResourceId = R.string.machine_info_button, onClick = { onMachineInfoButtonClicked() })
