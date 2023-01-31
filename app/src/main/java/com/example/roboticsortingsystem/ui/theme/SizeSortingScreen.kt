@@ -167,15 +167,16 @@ fun SizeSortingScreen (
                         viewModel.configuration[0] = 1
                         viewModel.configuration[1] = 1
                         viewModel.configuration[2] = viewModel.configuration[2] // Necessary to keep the value of the second cutoff when just the first is changed
+                        viewModel.configuration[3] = viewModel.configuration[3] // Same purpose for belt control bit
                     } else if (it.toInt() in 1 until RSS_MAX_SIZE) {
                         size1Input = it // Shows change to user
-                        viewModel.configuration = byteArrayOf(1, it.toByte(), viewModel.configuration[2]
-                        ) // Stores user input to ViewModel configuration. 1 = sorting by size
+                        viewModel.configuration = byteArrayOf(1, it.toByte(), viewModel.configuration[2], viewModel.configuration[3]) // Stores user input to ViewModel configuration. 1 = sorting by size
                     } else {
                         size1Input = RSS_MAX_SIZE.toString()
                         viewModel.configuration[0] = 1 // Only change relevant bytes in the array
                         viewModel.configuration[1] = RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                         showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
                     }
                 },
@@ -201,21 +202,17 @@ fun SizeSortingScreen (
                         size2Input = ""
                         viewModel.configuration[0] = 1
                         viewModel.configuration[1] = viewModel.configuration[1]
-                        viewModel.configuration[2] =
-                            1 // Index 2 corresponds to place in array for 2nd cutoff
+                        viewModel.configuration[2] = 1 // Index 2 corresponds to place in array for 2nd cutoff
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     } else if (it.toInt() in 0 until RSS_MAX_SIZE) { // 2nd value accepts 0
                         size2Input = it // Shows change to user
-                        viewModel.configuration = byteArrayOf(
-                            1,
-                            viewModel.configuration[1],
-                            it.toByte()
-                        ) // Stores user input to ViewModel configuration. 1 = sorting by size
+                        viewModel.configuration = byteArrayOf(1, viewModel.configuration[1], it.toByte(), viewModel.configuration[3]) // Stores user input to ViewModel configuration. 1 = sorting by size
                     } else {
                         size2Input = RSS_MAX_SIZE.toString()
                         viewModel.configuration[0] = 1
                         viewModel.configuration[1] = viewModel.configuration[1]
-                        viewModel.configuration[2] =
-                            RSS_MAX_SIZE.toByte() // Corresponds to 1st sorting cutoff
+                        viewModel.configuration[2] = RSS_MAX_SIZE.toByte() // Corresponds to 2nd sorting cutoff
+                        viewModel.configuration[3] = viewModel.configuration[3]
                         showToast(context, "Size cutoff must be between 0 and $RSS_MAX_SIZE.")
                     }
                 },

@@ -70,6 +70,19 @@ fun ColorSortInfo (
     }
 }
 
+@Composable
+fun BeltControlInfo(
+    beltControlValue: Int
+) {
+    if (beltControlValue == 1) {
+        DiagnosticText(info = "Belt status: Running")
+    } else if (beltControlValue == 0) {
+        DiagnosticText(info = "Belt status: Stopped")
+    } else {
+        DiagnosticText(info = "Belt status: Unknown")
+    }
+}
+
 // Draws the screen that shows diagnostic information from the RSS
 @OptIn(ExperimentalPermissionsApi::class)   // The Accompanist Jetpack Compose permissions library is still technically experimental,
                                             // but necessary for Composables to check permissions
@@ -165,6 +178,10 @@ fun MachineInfoScreen(
                             ColorSortInfo(binNumber = 2, viewModel)
                         }
                         else -> DiagnosticText(info = "Sorting type: Unknown")
+                    }
+                    // Display belt state
+                    if (viewModel.configuration.lastIndex == 3) { // When setting up the screen, the last index may not be 3
+                        BeltControlInfo(beltControlValue = viewModel.configuration[3].toInt())
                     }
                     // Display connection state
                     when (viewModel.connectionState) {

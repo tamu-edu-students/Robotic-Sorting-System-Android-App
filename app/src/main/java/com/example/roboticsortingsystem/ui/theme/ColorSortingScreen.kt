@@ -241,31 +241,37 @@ fun ColorSortingScreen(
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 1
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Orange" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 2
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Yellow" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 3
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Green" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 4
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Purple" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 5
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Brown" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = 6
                         viewModel.configuration[2] = viewModel.configuration[2]
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     else -> {} // Don't change anything if the returned color isn't valid
                 }
@@ -289,36 +295,43 @@ fun ColorSortingScreen(
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 0
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Red" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 1
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Orange" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 2
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Yellow" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 3
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Green" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 4
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Purple" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 5
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     "Brown" -> {
                         viewModel.configuration[0] = 2
                         viewModel.configuration[1] = viewModel.configuration[1]
                         viewModel.configuration[2] = 6
+                        viewModel.configuration[3] = viewModel.configuration[3]
                     }
                     else -> {} // Don't change anything if the returned color isn't valid
                 }

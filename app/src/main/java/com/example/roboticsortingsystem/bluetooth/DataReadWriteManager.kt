@@ -11,10 +11,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.roboticsortingsystem.*
 import com.example.roboticsortingsystem.util.Resource
 import kotlinx.coroutines.*
