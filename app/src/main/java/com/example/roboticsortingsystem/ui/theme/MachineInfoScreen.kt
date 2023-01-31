@@ -48,7 +48,9 @@ fun SizeSortInfo (
     cutoffNumber: Int,
     viewModel: RSSViewModel = hiltViewModel()
 ) {
-    DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[cutoffNumber]} cm")
+    if (viewModel.configuration[cutoffNumber].toInt() != 0) { // If no second cutoff is specified (is equal to 0), only one cutoff should be shown
+        DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[cutoffNumber]} cm")
+    }
 }
 
 // Provides diagnostic text for color sorting that can be expanded to n cutoffs
