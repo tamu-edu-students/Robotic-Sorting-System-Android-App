@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 // Specifies maximum size for sorting: anything above this will not be written to the ViewModel
 const val RSS_MAX_SIZE = 100
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 // Common framework for the two text boxes: simplifies code in SizeSortingScreen
 fun InputBox(

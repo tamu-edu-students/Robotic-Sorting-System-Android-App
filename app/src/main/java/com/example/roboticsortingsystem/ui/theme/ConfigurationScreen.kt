@@ -23,9 +23,9 @@ fun ConfigurationScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        ScreenSelectButton(labelResourceId = R.string.configuration_size_button, onClick = { onSizeButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.configuration_size_button, descripResourceId = R.string.size_description, onClick = { onSizeButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.configuration_color_button, onClick = { onColorButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.configuration_color_button, descripResourceId = R.string.color_description, onClick = { onColorButtonClicked() })
     }
 }
 

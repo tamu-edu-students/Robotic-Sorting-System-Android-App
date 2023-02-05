@@ -4,34 +4,56 @@ import android.content.Context
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.roboticsortingsystem.R
+import com.example.roboticsortingsystem.ui.theme.Shapes
 
 // This file contains common UI elements used in multiple screens to increase code readability.
 // Provides a common framework for the screen selection buttons
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenSelectButton(
     @StringRes labelResourceId: Int, // Used to put text on the button
+    @StringRes descripResourceId: Int,
     onClick: () -> Unit, // Used to determine click behavior
     modifier: Modifier = Modifier
 ) {
-    Button(
+    Card(
         onClick = onClick,
-        modifier.widthIn(min = 350.dp) // Temporary to make the screen look better: will make full-width later
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp),
+        shape = Shapes.large
+    ) { Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxHeight()
     ) {
-        Text(stringResource(id = labelResourceId))
+        Text(
+            text = stringResource(id = labelResourceId),
+            fontSize = 24.sp,
+            modifier = Modifier
+                .padding(horizontal = 18.dp)
+        )
+        // Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(id = descripResourceId),
+            fontSize = 18.sp,
+            fontStyle = FontStyle.Italic,
+            modifier = Modifier
+                .padding(horizontal = 18.dp)
+        )
+        }
     }
 }
 

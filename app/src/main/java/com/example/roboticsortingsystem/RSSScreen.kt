@@ -1,9 +1,10 @@
 package com.example.roboticsortingsystem
 
 import androidx.annotation.StringRes
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ enum class RSSScreen(@StringRes val title: Int) {
 }
 
 // Displays top bar and allows backward navigation where possible
+@OptIn(ExperimentalMaterial3Api::class) // Many parts of Material 3 are still technically "experimental"
 @Composable
 fun RSSAppTopBar(
     currentScreen: RSSScreen, // Passes in currently displayed screen
@@ -52,6 +54,7 @@ fun RSSAppTopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RSSApp( // Controls navigation between screens
     modifier: Modifier = Modifier, // Good practice to pass a default modifier
@@ -74,7 +77,7 @@ fun RSSApp( // Controls navigation between screens
         NavHost( // Controls screen navigation for the whole app
             navController = navController,
             startDestination = RSSScreen.Initial.name, // Tells the NavHost to start at the initial screen
-            modifier = Modifier // Uses modifier passed into RSSApp
+            modifier = Modifier.padding(it) // Padding value required for Material 3 deconfliction
         ) { // Call composables corresponding to each screen
             composable(route = RSSScreen.Initial.name) { // Calling the function within this composable allows navigation to/from the screen
                 InitialScreen(

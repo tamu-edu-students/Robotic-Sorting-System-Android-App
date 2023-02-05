@@ -2,9 +2,8 @@ package com.example.roboticsortingsystem.ui.theme
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -27,7 +25,6 @@ import com.example.roboticsortingsystem.bluetooth.SystemBroadcastReceiver
 import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 // Processes incoming conveyor belt data to user-readable format
 fun statusIn(valueIn: Byte): String {

@@ -24,13 +24,13 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        ScreenSelectButton(labelResourceId = R.string.belt_screen, onClick = { onBeltButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.belt_screen, descripResourceId = R.string.belt_description, onClick = { onBeltButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.configuration_button, onClick = { onConfigurationButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.configuration_button, descripResourceId = R.string.configuration_description, onClick = { onConfigurationButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.machine_info_button, onClick = { onMachineInfoButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.machine_info_button, descripResourceId = R.string.machine_info_description, onClick = { onMachineInfoButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
-        ScreenSelectButton(labelResourceId = R.string.support_button, onClick = { onSupportButtonClicked() })
+        ScreenSelectButton(labelResourceId = R.string.support_button, descripResourceId = R.string.support_description, onClick = { onSupportButtonClicked() })
     }
 }
 
