@@ -1,6 +1,7 @@
 package com.example.roboticsortingsystem.ui.theme
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +20,8 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
         modifier = modifier
-            .fillMaxWidth() // Makes buttons as wide as the screen: will be used for styling later
+            .padding(horizontal = 2.dp)
+            .fillMaxWidth()
             .fillMaxHeight(), // Centers the buttons vertically
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

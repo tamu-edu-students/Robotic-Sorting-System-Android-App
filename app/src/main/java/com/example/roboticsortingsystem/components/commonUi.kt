@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.roboticsortingsystem.R
 import com.example.roboticsortingsystem.ui.theme.Shapes
+import com.example.roboticsortingsystem.ui.theme.md_theme_light_onPrimary
+import com.example.roboticsortingsystem.ui.theme.md_theme_light_primary
 
 // This file contains common UI elements used in multiple screens to increase code readability.
 // Provides a common framework for the screen selection buttons
@@ -29,29 +32,35 @@ fun ScreenSelectButton(
     onClick: () -> Unit, // Used to determine click behavior
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Button(
         onClick = onClick,
+        shape = Shapes.large,
         modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        shape = Shapes.large
+            .width(1200.dp)
+            .height(IntrinsicSize.Min), // Sizes to the maximum size of the contents of the button
     ) { Column(
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier.fillMaxHeight()
     ) {
         Text(
             text = stringResource(id = labelResourceId),
             fontSize = 24.sp,
+            textAlign = TextAlign.Left,
             modifier = Modifier
                 .padding(horizontal = 18.dp)
+                .fillMaxWidth()
         )
         // Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = descripResourceId),
             fontSize = 18.sp,
             fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Left,
             modifier = Modifier
                 .padding(horizontal = 18.dp)
+                .fillMaxWidth()
         )
         }
     }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,8 +39,11 @@ fun RSSAppTopBar(
     navigateBack: () -> Unit, // Provides "back" functionality
     modifier: Modifier = Modifier
 ) {
-    TopAppBar(
-        title = { Text(stringResource(id = currentScreen.title)) },
+    CenterAlignedTopAppBar(
+        title = { Text(
+            stringResource(id = currentScreen.title),
+            fontWeight = FontWeight.Bold
+        ) },
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
