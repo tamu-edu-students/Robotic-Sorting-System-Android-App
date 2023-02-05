@@ -183,7 +183,7 @@ class DataReadWriteManager @Inject constructor(
                     BluetoothGatt.GATT_SUCCESS -> { // Value read successfully
                         Log.i("BluetoothGattCallback", "Read characteristic $uuid:\n${value.toHexString()}")
                         if (uuid.toString() == RSS_WEIGHT_UUID) {
-                            val rssWeight = value.first().toUInt()
+                            val rssWeight = value
                             val weightCapsule = WeightPackage(rssWeight) // Puts the weight in a weightPackage ("capsule") to go to the ViewModel
                             coroutineScope.launch {
                                 weightRead.emit(Resource.Success(weightCapsule))

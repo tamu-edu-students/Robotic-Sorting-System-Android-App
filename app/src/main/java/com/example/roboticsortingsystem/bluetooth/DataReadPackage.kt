@@ -5,7 +5,7 @@ data class ConfigurationPackage(
     val configuration: ByteArray // used for BLE transmission
 )
 data class WeightPackage(
-    val weight: UInt
+    val weight: ByteArray
 )
 data class ConnectionStatePackage(
     val connectionState: ConnectionState

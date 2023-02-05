@@ -21,7 +21,7 @@ class RSSViewModel @Inject constructor(
         private set
     var errorMessage by mutableStateOf<String?>(null)
         private set
-    var weight by mutableStateOf(0u) // u = unsigned: tells weight to expect a UInt
+    var weight by mutableStateOf(byteArrayOf(0, 0))
         private set // User should not write weight values
     var configuration by mutableStateOf<ByteArray>(byteArrayOf(0, 0))
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
