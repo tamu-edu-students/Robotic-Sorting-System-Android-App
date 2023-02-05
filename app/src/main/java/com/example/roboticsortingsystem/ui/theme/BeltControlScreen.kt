@@ -3,12 +3,15 @@ package com.example.roboticsortingsystem.ui.theme
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -125,11 +128,13 @@ fun BeltControlScreen (
                     viewModel.configuration[3] = 0 // Indicates to RSS to stop belt
                     viewModel.writeToRSS()
                     showToast(context, "Belt stopped")
-                }) {
+                },
+                colors = ButtonDefaults.buttonColors(md_theme_stop_button),
+                modifier = Modifier.height(64.dp)) {
                     // Stop button
                     Text(
                         text = stringResource(id = R.string.belt_stop),
-                        fontSize = 18.sp
+                        fontSize = 24.sp
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -140,11 +145,14 @@ fun BeltControlScreen (
                     viewModel.configuration[3] = 1 // Indicates to RSS to start belt
                     viewModel.writeToRSS()
                     showToast(context, "Belt started")
-                }) {
+                },
+                colors = ButtonDefaults.buttonColors(md_theme_start_button),
+                modifier = Modifier.height(64.dp)) {
                     // Start button
                     Text(
                         text = stringResource(id = R.string.belt_start),
-                        fontSize = 18.sp
+                        color = Color.Black,
+                        fontSize = 24.sp
                     )
                 }
             }
