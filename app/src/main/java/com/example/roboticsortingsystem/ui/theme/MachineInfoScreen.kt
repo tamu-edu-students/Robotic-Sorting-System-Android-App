@@ -2,8 +2,9 @@ package com.example.roboticsortingsystem.ui.theme
 
 import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -11,9 +12,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -25,15 +28,34 @@ import com.example.roboticsortingsystem.components.RSSLoadingScreen
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-// Provides common formatting for all text in the diagnostic box
+// Provides common formatting for all diagnostic cards
 @Composable
-fun DiagnosticText(
+fun DiagnosticCard(
+    title: String,
     info: String
 ) {
-    Text(
-        text = info,
-        textAlign = TextAlign.Center
-    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(8.dp),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            )
+            Text(
+                text = info,
+                fontSize = 24.sp
+            )
+        }
+    }
 }
 
 // Provides diagnostic text for size sorting that can be expanded to n cutoffs
@@ -43,7 +65,7 @@ fun SizeSortInfo (
     viewModel: RSSViewModel = hiltViewModel()
 ) {
     if (viewModel.configuration[cutoffNumber].toInt() != 0) { // If no second cutoff is specified (is equal to 0), only one cutoff should be shown
-        DiagnosticText(info = "Size cutoff $cutoffNumber: ${viewModel.configuration[cutoffNumber]} cm")
+        DiagnosticCard(title = "Size cutoff $cutoffNumber: ", info = "${viewModel.configuration[cutoffNumber]} cm")
     }
 }
 
@@ -54,13 +76,13 @@ fun ColorSortInfo (
     viewModel: RSSViewModel = hiltViewModel()
 ) {
     when (viewModel.configuration[binNumber].toInt()) { // Displays correct color based on encoding
-        1 -> { DiagnosticText(info = "Color for bin $binNumber: Red") }
-        2 -> { DiagnosticText(info = "Color for bin $binNumber: Orange") }
-        3 -> { DiagnosticText(info = "Color for bin $binNumber: Yellow") }
-        4 -> { DiagnosticText(info = "Color for bin $binNumber: Green") }
-        5 -> { DiagnosticText(info = "Color for bin $binNumber: Purple") }
-        6 -> { DiagnosticText(info = "Color for bin $binNumber: Brown") }
-        else -> { DiagnosticText(info = "Color for bin $binNumber: Unknown") }
+        1 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Red") }
+        2 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Orange") }
+        3 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Yellow") }
+        4 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Green") }
+        5 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Purple") }
+        6 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Brown") }
+        else -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Unknown") }
     }
 }
 
@@ -68,12 +90,10 @@ fun ColorSortInfo (
 fun BeltControlInfo(
     beltControlValue: Int
 ) {
-    if (beltControlValue == 1) {
-        DiagnosticText(info = "Belt status: Running")
-    } else if (beltControlValue == 0) {
-        DiagnosticText(info = "Belt status: Stopped")
-    } else {
-        DiagnosticText(info = "Belt status: Unknown")
+    when (beltControlValue) {
+        1 -> { DiagnosticCard(title = "Belt status: ", info = "Running") }
+        2 -> { DiagnosticCard(title = "Belt status: ", info = "Stopped") }
+        else -> { DiagnosticCard(title = "Belt status: ", info = "Unknown") }
     }
 }
 
@@ -136,58 +156,50 @@ fun MachineInfoScreen(
 
     // Nested columns ensure that arrangement works correctly
     if (bleConnectionState == ConnectionState.Connected) {
+
+
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(
+            LazyColumn(
                 modifier = modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .border(width = 1.dp, color = Color.Green) // Basic theming to identify this as diagnostic info: will make more visually appealing later
             ) {
-                // TODO: change to a fixed-width font in DiagnosticTest function
-                if (bleConnectionState == ConnectionState.Uninitialized) {
-                    DiagnosticText(info = "Uninitialized")
-                }
-                else if (bleConnectionState == ConnectionState.Initializing) {
-                    if (viewModel.initializingMessage != null) {
-                        Text(
-                            text = viewModel.initializingMessage!!
-                        )
-                    }
-                }
-                else if (bleConnectionState == ConnectionState.Connected) {
-                    // Display weight
-                    DiagnosticText(info = "Weight: ${viewModel.weight}")
+                if (bleConnectionState == ConnectionState.Connected) {
+                    // Display weight using "item" for LazyColumn
+                    item {(DiagnosticCard(title = "Weight: ", info = "${viewModel.weight}"))}
                     // Display sorting configuration
-                    when (viewModel.configuration.first().toInt()) {
+                    item { when (viewModel.configuration.first().toInt()) {
                         1 -> { // Indicates size configuration
-                            DiagnosticText(info = "Sorting type: Size")
+                            DiagnosticCard(title = "Sorting type: ", info = "Size")
                             SizeSortInfo(cutoffNumber = 1, viewModel)
                             SizeSortInfo(cutoffNumber = 2, viewModel)
                         }
                         2 -> { // Indicates color configuration
-                            DiagnosticText(info = "Sorting type: Color")
+                            DiagnosticCard(title = "Sorting type: ", info = "Color")
                             ColorSortInfo(binNumber = 1, viewModel)
                             ColorSortInfo(binNumber = 2, viewModel)
                         }
-                        else -> DiagnosticText(info = "Sorting type: Unknown")
-                    }
+                        else -> DiagnosticCard(title = "Sorting type: ", info = "Unknown")
+                    } }
                     // Display belt state
-                    if (viewModel.configuration.lastIndex == 3) { // When setting up the screen, the last index may not be 3
+                    item {if (viewModel.configuration.lastIndex == 3) { // When setting up the screen, the last index may not be 3
                         BeltControlInfo(beltControlValue = viewModel.configuration[3].toInt())
-                    }
+                    }}
                     // Display connection state
-                    when (viewModel.connectionState) {
-                        ConnectionState.Connected -> DiagnosticText(info = "Connection state: Connected")
-                        ConnectionState.Disconnected -> DiagnosticText(info = "Connection state: Disconnected")
-                        ConnectionState.Initializing -> DiagnosticText(info = "Connection state: Initializing")
-                        ConnectionState.Uninitialized -> DiagnosticText(info = "Connection state: Uninitialized")
-                        else -> DiagnosticText(info = "Connection state: Unknown")
+                    item {
+                        when (viewModel.connectionState) {
+                            ConnectionState.Connected -> DiagnosticCard(title = "Connection state: ", info = "Connected")
+                            ConnectionState.Disconnected -> DiagnosticCard(title = "Connection state: ", info = "Disconnected")
+                            ConnectionState.Initializing -> DiagnosticCard(title = "Connection state: ", info = "Initializing")
+                            ConnectionState.Uninitialized -> DiagnosticCard(title = "Connection state: ", info = "Uninitialized")
+                            else -> DiagnosticCard(title = "Connection state: ", info = "Unknown")
+                        }
                     }
                 }
                 else if (viewModel.errorMessage != null) {
-                    DiagnosticText(info = viewModel.errorMessage!!)
+                    item {DiagnosticCard(title = "viewModel error: ", info = viewModel.errorMessage!!)}
                 }
             }
         }
