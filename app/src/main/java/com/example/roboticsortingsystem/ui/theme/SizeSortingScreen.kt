@@ -8,6 +8,7 @@ import android.widget.Toast.LENGTH_SHORT
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -16,9 +17,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,12 +54,13 @@ fun InputBox(
     onValueChange: (String) -> Unit = {},
     keyboardOptions: KeyboardOptions // Used to pass in a style of keyboard
 ) {
-
+    val focusManager = LocalFocusManager.current // Used to close the keyboard
     TextField(
         value = entry,
         onValueChange = onValueChange,
         label = { Text(stringResource(id = label)) },
-        keyboardOptions = keyboardOptions // Sets the type of keyboard as passed in by the caller
+        keyboardOptions = keyboardOptions, // Sets the type of keyboard as passed in by the caller
+        keyboardActions = KeyboardActions(onDone = {focusManager.clearFocus()}) // Closes keyboard
     )
 }
 
@@ -181,8 +185,10 @@ fun SizeSortingScreen (
                         showToast(context, "Size cutoff must be between 1 and $RSS_MAX_SIZE.")
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
-                // TODO: why does hitting the enter button on this cause a crash? Maybe have it just go to the next box/send config...
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
             )
 
 
@@ -218,7 +224,10 @@ fun SizeSortingScreen (
                         showToast(context, "Size cutoff must be between 0 and $RSS_MAX_SIZE.")
                     }
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Note that this keyboard forces number inputs only
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
