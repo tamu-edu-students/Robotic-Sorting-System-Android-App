@@ -191,6 +191,7 @@ fun SizeSortingScreen (
                 text = stringResource(id = R.string.size_size1_solo_box_info),
                 textAlign = TextAlign.Center
             )
+            Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
             Spacer(modifier = Modifier.height(16.dp))
 
 
@@ -229,7 +230,7 @@ fun SizeSortingScreen (
                 text = (stringResource(id = R.string.size_size2_box_info)),
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Divider(thickness = 1.dp, modifier = modifier.padding(top = 16.dp, bottom = 16.dp))
             // Persistent column for current size
             Column(
                 modifier = Modifier

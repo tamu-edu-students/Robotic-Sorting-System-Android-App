@@ -20,7 +20,7 @@ fun InitialScreen( // Creates the screen initially shown on launching the app
 ) {
     Column( // Places all of the buttons in a "column" object for easy alignment
         modifier = modifier
-            .padding(horizontal = 2.dp)
+            .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .fillMaxHeight(), // Centers the buttons vertically
         horizontalAlignment = Alignment.CenterHorizontally,
