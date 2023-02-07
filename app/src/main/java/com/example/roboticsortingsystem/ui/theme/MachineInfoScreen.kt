@@ -170,6 +170,7 @@ fun MachineInfoScreen(
                     // Display weight using "item" for LazyColumn
                     item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${viewModel.weight[0]}"))}
                     item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${viewModel.weight[1]}"))}
+                    item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${viewModel.weight[2]}"))}
                     // Display sorting configuration
                     item { when (viewModel.configuration.first().toInt()) {
                         1 -> { // Indicates size configuration
