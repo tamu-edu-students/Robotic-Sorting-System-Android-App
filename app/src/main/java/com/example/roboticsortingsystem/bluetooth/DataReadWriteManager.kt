@@ -73,7 +73,7 @@ class DataReadWriteManager @Inject constructor(
                             connectionStateRead.emit(Resource.Loading(message = "RSS found. Connecting..."))
                         }
                         stopBleScan() // Keeps device from continuing to scan for Bluetooth devices after connection, which wastes resources
-                        connectGatt(context, false, gattCallback)
+                        connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE) // Final argument specifies a BLE connection. Necessary for Android 13 to work
                     }
                 }
         }
@@ -91,9 +91,10 @@ class DataReadWriteManager @Inject constructor(
         containsProperty(BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)
 
     @SuppressLint("MissingPermission")
-    fun rssRead(
+    suspend fun rssRead( // Suspend due to delay call
         gatt: BluetoothGatt
     ) {
+        delay(500L) // Necessary to let the system "catch its breath"
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)
@@ -165,7 +166,9 @@ class DataReadWriteManager @Inject constructor(
                 printGattTable() // Prints table of services
                 gatt.requestMtu(GATT_MAX_MTU_SIZE) // Note minimum MTU size is 23
                 this@DataReadWriteManager.gatt = gatt // Sets DataReadWriteManager-level gatt variable so other functions can use it
-                rssRead(gatt) // Initial read to initialize ViewModel
+                coroutineScope.launch {
+                    rssRead(gatt) // Initial read to initialize ViewModel
+                }
             }
         }
         // Request larger Maximum Transmission Unit (MTU)
