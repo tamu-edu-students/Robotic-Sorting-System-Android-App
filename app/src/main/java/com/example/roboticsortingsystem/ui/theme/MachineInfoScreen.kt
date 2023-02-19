@@ -91,8 +91,8 @@ fun BeltControlInfo(
     beltControlValue: Int
 ) {
     when (beltControlValue) {
-        0 -> { DiagnosticCard(title = "Belt status: ", info = "Running") }
-        1 -> { DiagnosticCard(title = "Belt status: ", info = "Stopped") }
+        0 -> { DiagnosticCard(title = "Belt status: ", info = "Stopped") }
+        1 -> { DiagnosticCard(title = "Belt status: ", info = "Running") }
         else -> { DiagnosticCard(title = "Belt status: ", info = "Unknown") }
     }
 }
