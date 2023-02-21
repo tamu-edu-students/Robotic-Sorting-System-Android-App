@@ -4,7 +4,9 @@
 
     <!-- Android 12+ Bluetooth permissions -->
     <!-- Scans for Bluetooth devices without using location (and asserts such) -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
     <!-- Allows interaction with connected Bluetooth devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
