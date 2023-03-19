@@ -25,6 +25,7 @@
     <string name="configuration_button">Sorting Configuration</string>
     <string name="configuration_size_button">Sort by Size</string>
     <string name="configuration_color_button">Sort by Color</string>
+    <string name="configuration_defect_button">Sort by Fruit Quality</string>
     <string name="configuration_description">Set the sorting parameters for the Robotic Sorting System.</string>
     <string name="size_screen">Sort by Size</string>
     <string name="size_description">Configure the Robotic Sorting System to sort using size cutoffs.</string>
@@ -46,4 +47,7 @@
     <string name="color_green">Green</string>
     <string name="color_yellow">Yellow</string>
     <string name="color_brown">Brown</string>
+    <string name="defect_screen">Sort by Fruit Quality</string>
+    <string name="defect_description">Configure the Robotic Sorting System to sort defective and healthy fruit.</string>
+    <string name="defect_info">Pressing the "Send Configuration to System" button will configure the Robotic Sorting System to sort healthy fruit into Bin 1 and defective fruit into bin 2.</string>
 </resources>

@@ -14,7 +14,8 @@ import com.example.roboticsortingsystem.components.ScreenSelectButton
 fun ConfigurationScreen(
     modifier: Modifier = Modifier,
     onSizeButtonClicked: () -> Unit = {},
-    onColorButtonClicked: () -> Unit = {}
+    onColorButtonClicked: () -> Unit = {},
+    onDefectButtonClicked: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -27,6 +28,8 @@ fun ConfigurationScreen(
         ScreenSelectButton(labelResourceId = R.string.configuration_size_button, descripResourceId = R.string.size_description, onClick = { onSizeButtonClicked() })
         Spacer(modifier = Modifier.height(16.dp))
         ScreenSelectButton(labelResourceId = R.string.configuration_color_button, descripResourceId = R.string.color_description, onClick = { onColorButtonClicked() })
+        Spacer(modifier = Modifier.height(16.dp))
+        ScreenSelectButton(labelResourceId = R.string.configuration_defect_button, descripResourceId = R.string.defect_description, onClick = { onDefectButtonClicked() })
     }
 }
 

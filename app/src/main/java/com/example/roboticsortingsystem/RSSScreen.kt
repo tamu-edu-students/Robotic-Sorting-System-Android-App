@@ -27,6 +27,7 @@ enum class RSSScreen(@StringRes val title: Int) {
     Configuration(title = R.string.configuration_screen),
     SizeSorting(title = R.string.size_screen),
     ColorSorting(title = R.string.color_screen),
+    DefectSorting(title = R.string.defect_screen),
     BeltControl(title = R.string.belt_screen)
 }
 
@@ -100,7 +101,8 @@ fun RSSApp( // Controls navigation between screens
             composable(route = RSSScreen.Configuration.name) {
                 ConfigurationScreen(
                     onSizeButtonClicked = {navController.navigate(RSSScreen.SizeSorting.name)},
-                    onColorButtonClicked = {navController.navigate(RSSScreen.ColorSorting.name)}
+                    onColorButtonClicked = {navController.navigate(RSSScreen.ColorSorting.name)},
+                    onDefectButtonClicked = {navController.navigate(RSSScreen.DefectSorting.name)}
                 )
             }
             composable(route = RSSScreen.SizeSorting.name) {
@@ -114,6 +116,9 @@ fun RSSApp( // Controls navigation between screens
                     onCancelButtonClicked = { returnToStart(navController) },
                     onBluetoothStateChanged = onBluetoothStateChanged
                 )
+            }
+            composable(route = RSSScreen.DefectSorting.name) {
+                DefectSortingScreen(onBluetoothStateChanged = { onBluetoothStateChanged })
             }
             composable(route = RSSScreen.BeltControl.name) {
                 BeltControlScreen(onBluetoothStateChanged = onBluetoothStateChanged)
