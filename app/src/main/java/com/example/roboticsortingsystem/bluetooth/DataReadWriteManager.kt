@@ -54,6 +54,7 @@ class DataReadWriteManager @Inject constructor(
     // Applies scan settings
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)  // Scans for a short period of time at low latency
+        .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
         .build()
 
     private var gatt: BluetoothGatt? = null
@@ -94,7 +95,7 @@ class DataReadWriteManager @Inject constructor(
     suspend fun rssRead( // Suspend due to delay call
         gatt: BluetoothGatt
     ) {
-        delay(500L) // Necessary to let the system "catch its breath"
+        delay(100L) // Necessary to let the system "catch its breath"
         val rssUUID = UUID.fromString(RSS_SERVICE_UUID)
         val rssWeightUUID = UUID.fromString(RSS_WEIGHT_UUID)
         val rssConfigUUID = UUID.fromString(RSS_CONFIG_UUID)

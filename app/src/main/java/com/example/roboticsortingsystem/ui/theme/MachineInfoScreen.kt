@@ -86,11 +86,22 @@ fun ColorSortInfo (
     }
 }
 
+// Provides diagnostic text for defect-based sorting
+
+@Composable
+fun DefectSortInfo (
+    viewModel: RSSViewModel = hiltViewModel()
+) {
+    DiagnosticCard(title = "Bin 1: ", info = "Healthy fruit")
+    DiagnosticCard(title = "Bin 2: ", info = "Defective fruit")
+}
+
 @Composable
 fun BeltControlInfo(
     beltControlValue: Int
 ) {
     when (beltControlValue) {
+        -1 -> { DiagnosticCard(title = "Belt status: ", info = "FAULT")} // Intended for obstructed belt situation
         0 -> { DiagnosticCard(title = "Belt status: ", info = "Stopped") }
         1 -> { DiagnosticCard(title = "Belt status: ", info = "Running") }
         else -> { DiagnosticCard(title = "Belt status: ", info = "Unknown") }
@@ -168,9 +179,24 @@ fun MachineInfoScreen(
             ) {
                 if (bleConnectionState == ConnectionState.Connected) {
                     // Display weight using "item" for LazyColumn
-                    item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${viewModel.weight[0]}"))}
-                    item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${viewModel.weight[1]}"))}
-                    item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${viewModel.weight[2]}"))}
+                    // Handle sensor error (sensor value = -1)
+                    if (viewModel.weight[0].toInt() == -1) {
+                        item {(DiagnosticCard(title = "Weight for bin 1: ", info = "FAULT"))}
+                    } else {
+                        item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${viewModel.weight[0]}"))}
+                    }
+
+                    if (viewModel.weight[1].toInt() == -1) {
+                        item {(DiagnosticCard(title = "Weight for bin 2: ", info = "FAULT"))}
+                    } else {
+                        item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${viewModel.weight[1]}"))}
+                    }
+
+                    if (viewModel.weight[2].toInt() == -1) {
+                        item {(DiagnosticCard(title = "Weight for bin 3: ", info = "FAULT"))}
+                    } else {
+                        item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${viewModel.weight[2]}"))}
+                    }
                     // Display sorting configuration
                     item { when (viewModel.configuration.first().toInt()) {
                         1 -> { // Indicates size configuration
@@ -182,6 +208,9 @@ fun MachineInfoScreen(
                             DiagnosticCard(title = "Sorting type: ", info = "Color")
                             ColorSortInfo(binNumber = 1, viewModel)
                             ColorSortInfo(binNumber = 2, viewModel)
+                        }
+                        3 -> { // Indicates defect configuration
+                            DefectSortInfo(viewModel)
                         }
                         else -> DiagnosticCard(title = "Sorting type: ", info = "Unknown")
                     } }
