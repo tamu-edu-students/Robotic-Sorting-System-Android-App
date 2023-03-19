@@ -32,8 +32,10 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 fun DefectSortingScreen (
     modifier: Modifier = Modifier,
     onBluetoothStateChanged: () -> Unit,
-    viewModel: RSSViewModel = hiltViewModel()
+    viewModel: RSSViewModel = hiltViewModel(),
+    bleConnectionState: ConnectionState
 ){
+    /*
     // *************************************************
     // Standard Bluetooth injection/update logic from other screens
     // *************************************************
@@ -87,12 +89,20 @@ fun DefectSortingScreen (
             }
         }
     }
-
+    */
 
     // *************************************************
     // UI logic
     // *************************************************
     val context = LocalContext.current
+    var currentState = ""
+    if (bleConnectionState == ConnectionState.Uninitialized) {
+        currentState = "Reading belt status..."
+    } else {
+        if (viewModel.configuration.lastIndex == 3) { // Prevents crash before ViewModel fully initializes by preventing a read out of index range
+            currentState = statusIn(viewModel.configuration[3])
+        }
+    }
     if (bleConnectionState == ConnectionState.Connected){
         Column (
             modifier = Modifier

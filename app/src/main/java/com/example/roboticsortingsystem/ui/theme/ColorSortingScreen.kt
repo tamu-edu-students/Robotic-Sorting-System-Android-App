@@ -42,7 +42,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 fun ColorButtons(
     modifier: Modifier = Modifier,
     allowsNone: Boolean,
-    onSelectionChanged: (String) -> Unit = {} // Notifies caller that a selection was made/changed
+    onSelectionChanged: (String) -> Unit = {}, // Notifies caller that a selection was made/changed
 ) {
 
     // List stores all possible color choices
@@ -153,10 +153,10 @@ fun ColorSortingScreen(
     modifier: Modifier = Modifier,
     onCancelButtonClicked: () -> Unit = {},
     onBluetoothStateChanged: () -> Unit,
-    viewModel: RSSViewModel = hiltViewModel()
+    viewModel: RSSViewModel = hiltViewModel(),
+    bleConnectionState: ConnectionState
 ) {
 
-    // Bluetooth injection and update logic
     // SystemBroadcastReceiver listens for state changes from the BluetoothAdapter (e.g. user turns off Bluetooth)
     // and launches a re-activation prompt from the passed-in onBluetoothStateChanged function
     SystemBroadcastReceiver(systemAction = BluetoothAdapter.ACTION_STATE_CHANGED) { bluetoothState ->
@@ -165,7 +165,7 @@ fun ColorSortingScreen(
             onBluetoothStateChanged()
         }
     }
-
+/*
     val permissionState = rememberMultiplePermissionsState(permissions = PermissionState.permissions)
     val lifecycleOwner = LocalLifecycleOwner.current
     val bleConnectionState = viewModel.connectionState
@@ -194,17 +194,7 @@ fun ColorSortingScreen(
             }
         }
     )
-
-    // LaunchedEffect launches when all permissions are granted: specifically, starts connection if all permissions are granted and the connection is not already established
-    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
-        if (permissionState.allPermissionsGranted) {
-            if (bleConnectionState  == ConnectionState.Uninitialized) {
-                viewModel.initializeConnection()
-            }
-        }
-    }
-
-
+    */
     // UI
     var color1Input by rememberSaveable { mutableStateOf("") } // Stores user's chosen colors
     var color2Input by rememberSaveable { mutableStateOf("") }

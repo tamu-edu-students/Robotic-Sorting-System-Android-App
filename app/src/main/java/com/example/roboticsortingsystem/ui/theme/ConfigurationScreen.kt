@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.roboticsortingsystem.R
+import com.example.roboticsortingsystem.bluetooth.ConnectionState
 import com.example.roboticsortingsystem.components.ScreenSelectButton
 
 // Creates screen to choose from size sorting or color sorting
@@ -15,7 +16,8 @@ fun ConfigurationScreen(
     modifier: Modifier = Modifier,
     onSizeButtonClicked: () -> Unit = {},
     onColorButtonClicked: () -> Unit = {},
-    onDefectButtonClicked: () -> Unit = {}
+    onDefectButtonClicked: () -> Unit = {},
+    bleConnectionState: ConnectionState
 ) {
     Column(
         modifier = Modifier
@@ -37,5 +39,5 @@ fun ConfigurationScreen(
 @Preview
 @Composable
 fun ConfigurationScreenPreview() {
-    ConfigurationScreen()
+    // ConfigurationScreen()
 }

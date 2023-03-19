@@ -89,8 +89,10 @@ fun SizeSortingScreen (
     modifier: Modifier = Modifier,
     onCancelButtonClicked: () -> Unit = {}, // Allows the main RSSScreen to pass in cancel button behavior
     onBluetoothStateChanged: () -> Unit,
-    viewModel: RSSViewModel = hiltViewModel()
+    viewModel: RSSViewModel = hiltViewModel(),
+    bleConnectionState: ConnectionState
 ) {
+    /*
     // Bluetooth injection and update logic
     // SystemBroadcastReceiver listens for state changes from the BluetoothAdapter (e.g. user turns off Bluetooth)
     // and launches a re-activation prompt from the passed-in onBluetoothStateChanged function
@@ -132,15 +134,7 @@ fun SizeSortingScreen (
             }
         }
     )
-
-    // LaunchedEffect launches when all permissions are granted: specifically, starts connection if all permissions are granted and the connection is not already established
-    LaunchedEffect(key1 = permissionState.allPermissionsGranted) {
-        if (permissionState.allPermissionsGranted) {
-            if (bleConnectionState == ConnectionState.Uninitialized) {
-                viewModel.initializeConnection()
-            }
-        }
-    }
+    */
 
 
     // UI logic

@@ -23,7 +23,7 @@ class RSSViewModel @Inject constructor(
         private set
     var weight by mutableStateOf(byteArrayOf(0, 0, 0))
         private set // User should not write weight values
-    var configuration by mutableStateOf<ByteArray>(byteArrayOf(0, 0))
+    var configuration by mutableStateOf<ByteArray>(byteArrayOf(0, 0, 0, 0))
     var connectionState by mutableStateOf<ConnectionState>(ConnectionState.Uninitialized)
 
     private fun subscribeToChanges() { // Updates ViewModel every time the read value changes
