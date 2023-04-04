@@ -180,22 +180,28 @@ fun MachineInfoScreen(
                 if (bleConnectionState == ConnectionState.Connected) {
                     // Display weight using "item" for LazyColumn
                     // Handle sensor error (sensor value = -1)
-                    if (viewModel.weight[0].toInt() == -1) {
+                    if (viewModel.weight[0].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 1: ", info = "FAULT"))}
                     } else {
                         item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${viewModel.weight[0]}"))}
                     }
 
-                    if (viewModel.weight[1].toInt() == -1) {
+                    if (viewModel.weight[1].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 2: ", info = "FAULT"))}
                     } else {
                         item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${viewModel.weight[1]}"))}
                     }
 
-                    if (viewModel.weight[2].toInt() == -1) {
+                    if (viewModel.weight[2].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 3: ", info = "FAULT"))}
                     } else {
                         item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${viewModel.weight[2]}"))}
+                    }
+                    // Display sensor error
+                    if (viewModel.weight[3].toInt() == 255) {
+                        item {(DiagnosticCard(title = "Sensor status: ", info = "FAULT"))}
+                    } else {
+                        item {(DiagnosticCard(title = "Sensor status: ", info = "Normal"))}
                     }
                     // Display sorting configuration
                     item { when (viewModel.configuration.first().toInt()) {
