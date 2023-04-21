@@ -80,8 +80,9 @@ fun ColorSortInfo (
         2 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Orange") }
         3 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Yellow") }
         4 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Green") }
-        5 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Purple") }
-        6 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Brown") }
+        5 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Blue") }
+        6 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Purple") }
+        7 -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Brown") }
         else -> { DiagnosticCard(title = "Color for bin $binNumber: ", info = "Unknown") }
     }
 }
