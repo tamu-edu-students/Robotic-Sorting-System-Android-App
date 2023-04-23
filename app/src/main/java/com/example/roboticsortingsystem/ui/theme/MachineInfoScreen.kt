@@ -184,19 +184,19 @@ fun MachineInfoScreen(
                     if (viewModel.weight[0].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 1: ", info = "FAULT"))}
                     } else {
-                        item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${viewModel.weight[0]}"))}
+                        item {(DiagnosticCard(title = "Weight for bin 1: ", info = "${(viewModel.weight[0] / 0.0373)}"))}
                     }
 
                     if (viewModel.weight[1].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 2: ", info = "FAULT"))}
                     } else {
-                        item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${viewModel.weight[1]}"))}
+                        item {(DiagnosticCard(title = "Weight for bin 2: ", info = "${(viewModel.weight[1] / 0.0361)}"))}
                     }
 
                     if (viewModel.weight[2].toInt() == 255) {
                         item {(DiagnosticCard(title = "Weight for bin 3: ", info = "FAULT"))}
                     } else {
-                        item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${viewModel.weight[2]}"))}
+                        item {(DiagnosticCard(title = "Weight for bin 3: ", info = "${(viewModel.weight[2] / 0.0281)}"))}
                     }
                     // Display sensor error
                     if (viewModel.weight[3].toInt() == 255) {
