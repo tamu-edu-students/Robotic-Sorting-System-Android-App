@@ -67,7 +67,7 @@ fun InputBox(
 // Converts raw numbers from ViewModel to an easily displayed string
 fun sizeIn(raw: ByteArray) : String {
     return if (raw.first().toInt() == 1) { // If the first byte is 1, the machine is currently configured for color
-        "Cutoff 1: ${raw[1]} cm, Cutoff 2: ${raw[2]} cm" // Second byte is the sort value
+        "Cutoff 1: ${raw[1]} in., Cutoff 2: ${raw[2]} in." // Second byte is the sort value
     }
     else {
         "Currently configured for color"

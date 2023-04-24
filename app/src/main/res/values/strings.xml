@@ -31,7 +31,7 @@
     <string name="size_description">Configure the Robotic Sorting System to sort using size cutoffs.</string>
     <string name="size_size1_box_label">Size 1</string>
     <string name="size_size2_box_label">Size 2</string>
-    <string name="size_size1_solo_box_info">Enter the cutoff size. Fruits larger in diameter than this value will be sorted into one bin while larger fruits will go into another.</string>
+    <string name="size_size1_solo_box_info">Enter the cutoff size in inches. Fruits larger in diameter than this value will be sorted into one bin while larger fruits will go into another.</string>
     <string name="size_size1_box_info">For two-bin sorting, fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters larger than Size 1 will be placed in bin 2.</string>
     <string name="size_size2_default_info">For two-bin sorting, leave Size 2 blank.</string>
     <string name="size_size2_box_info">For three-bin sorting, add a number for Size 2. Fruits with diameters smaller than Size 1 will be placed in Bin 1. Fruits with diameters between Size 1 and Size 2 will be placed in Bin 2. Fruits with diameters larger than Size 2 will be placed in Bin 3.</string>
