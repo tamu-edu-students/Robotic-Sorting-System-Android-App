@@ -216,7 +216,7 @@ fun ColorSortingScreen(
         currentColor = colorIn(viewModel.configuration)
     }
 
-    if (bleConnectionState == ConnectionState.Connected) {
+    if (1 == 1) {
         Column(
             modifier = Modifier
                 .padding(16.dp)

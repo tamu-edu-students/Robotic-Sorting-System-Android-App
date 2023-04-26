@@ -112,7 +112,7 @@ fun BeltControlScreen (
             currentState = statusIn(viewModel.configuration[3])
         }
     }
-    if (bleConnectionState == ConnectionState.Connected) {
+    if (1 == 1) {
         Column (
             modifier = Modifier
                 .fillMaxHeight()

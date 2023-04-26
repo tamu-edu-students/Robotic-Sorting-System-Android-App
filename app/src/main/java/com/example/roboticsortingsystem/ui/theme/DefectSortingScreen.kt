@@ -93,7 +93,7 @@ fun DefectSortingScreen (
     // UI logic
     // *************************************************
     val context = LocalContext.current
-    if (bleConnectionState == ConnectionState.Connected){
+    if (1 == 1){
         Column (
             modifier = Modifier
                 .fillMaxHeight()
